@@ -1,43 +1,58 @@
 {
+   "manifest_version": 3,
+   "name": "SHINE for reddit (unofficial)",
+   "short_name": "SHINE",
+   "version": "2.0.0",
+   "description": "Experience old reddit with modern list and grid view interfaces that focus on bringing the content to you.",
+   "icons": {
+      "16": "icon-16.png",
+      "48": "icon-48.png",
+      "128": "icon-128.png"
+   },
+   "action": {
+      "default_icon": {
+         "16": "icon-16.png",
+         "48": "icon-48.png",
+         "128": "icon-128.png"
+      },
+      "default_title": "Open old reddit"
+   },
    "background": {
+      "service_worker": "background.js",
       "scripts": [ "background.js" ]
    },
-   "browser_action": {
-      "default_icon": "icon-128.png"
+   "permissions": [ "storage", "scripting", "declarativeNetRequestWithHostAccess" ],
+   "host_permissions": [ "*://*.reddit.com/*" ],
+   "declarative_net_request": {
+      "rule_resources": [ {
+         "id": "old_reddit_redirect",
+         "enabled": true,
+         "path": "rules/old-reddit-redirect.json"
+      } ]
    },
    "content_scripts": [ {
-      "css": [ 
-         "fonts.css", 
-         "base.css", 
-         "shine-grid.css", 
-         "shine-list.css", 
-         "shine-list-classic.css", 
+      "css": [
+         "fonts.css",
+         "base.css",
+         "shine-grid.css",
+         "shine-list.css",
+         "shine-list-classic.css",
          "shine-default.css",
-         "materialdesignicons.min.css"
-      ],
-      "matches": [ "*://*.reddit.com/*" ],
-      "run_at":"document_start"
-   }, {
-      "css": [ 
-         "themes/nightmode.css", 
-         "themes/theme-violet.css", 
-         "themes/theme-gray.css", 
-         "themes/theme-black.css", 
-         "themes/theme-dark.css", 
-         "themes/theme-blue.css", 
-         "themes/theme-brown.css", 
-         "themes/theme-material.css", 
-         "themes/theme-modernwhite.css"
-      ],
-      "matches": [ "*://*.reddit.com/*" ],
-      "run_at":"document_start"
-   }, {
-      "css": [ 
+         "materialdesignicons.min.css",
+         "themes/nightmode.css",
+         "themes/theme-violet.css",
+         "themes/theme-gray.css",
+         "themes/theme-black.css",
+         "themes/theme-dark.css",
+         "themes/theme-blue.css",
+         "themes/theme-brown.css",
+         "themes/theme-material.css",
+         "themes/theme-modernwhite.css",
          "colors/color-red.css",
          "colors/color-orange.css",
          "colors/color-amber.css",
-         "colors/color-lime.css", 
-         "colors/color-greenlight.css", 
+         "colors/color-lime.css",
+         "colors/color-greenlight.css",
          "colors/color-teal.css",
          "colors/color-cyan.css",
          "colors/color-blue.css",
@@ -46,35 +61,29 @@
          "colors/color-yellow.css",
          "colors/color-purple.css"
       ],
-      "matches": [ "*://*.reddit.com/*" ],
-      "run_at":"document_start"
+      "matches": [ "*://old.reddit.com/*" ],
+      "run_at": "document_start"
    }, {
-      "js": [ 
-         "jquery-2.1.4.min.js", 
+      "js": [
+         "jquery-3.7.1.min.js",
          "base.js"
-      ],  
+      ],
+      "matches": [ "*://old.reddit.com/*" ],
+      "run_at": "document_end"
+   }, {
+      "js": [ "shine-detect.js" ],
       "matches": [ "*://*.reddit.com/*" ],
-      "run_at":"document_end"
+      "exclude_matches": [ "*://old.reddit.com/*" ],
+      "run_at": "document_end"
    } ],
-   "content_security_policy": "script-src 'self'; object-src 'self'",
-   "description": "Experience reddit with new modern list and grid view interfaces that focus on bringing the content to you.",
-   "icons": {
-      "128": "icon-128.png",
-      "16": "icon-16.png",
-      "48": "icon-48.png"
-   },
-   "key": "MIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKCAQEAq2flgtIP0hsysk0MoTfR2EAIdrBSg7kLUFddRAt+diy1gyhINoDCJgxJ8eNj+8Mo7+IHS7U5JbHc2boGg0rJ1Wa+4StCoR7uRtcw0OyatnJbSPyTQeVJqf42XxP9eEotpcvWF1P1bL/fHN6LC3VbKUFF6DNvg8HNz3o1bDjG/GArWAs6PeCoxwLXhgQwundV9AmoqoWmDD7psalrnSpwXnmlK0G3h9q1KOkzx6UfGHO6P4POJhNytucP3bA2ADRmrhJMvc9e9Iy/FgKdDBlrBNy7VqnkKoXU5ki8BLKnAZqvFNlr116/DnVaPX35dCJUzdQpmXak8i2x+PoTF96VEwIDAQAB",
-   "manifest_version": 2,
-   "name": "SHINE for reddit (unofficial)",
-   "permissions": [ "storage" ],
-   "short_name": "SHINE",
-   "update_url": "https://clients2.google.com/service/update2/crx",
-   "version": "1.6.0",
-   "web_accessible_resources": [ 
-      "jquery.zoom.min.js", 
-      "shine-grid.js", 
-      "shine-list.js", 
-      "shine-shortcuts.js",
-      "materialdesignicons-webfont.woff2"
-   ]
+   "web_accessible_resources": [ {
+      "resources": [ "materialdesignicons-webfont.woff2" ],
+      "matches": [ "*://*.reddit.com/*" ]
+   } ],
+   "browser_specific_settings": {
+      "gecko": {
+         "id": "shine-unofficial@fork.local",
+         "strict_min_version": "128.0"
+      }
+   }
 }

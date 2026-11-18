@@ -46,7 +46,12 @@ function getAlbumImage(api, target){
 
       },
       error: function(request, status, message) {
-      	console.log(message);
+      	// the shared Imgur API key is often rate limited: use reddit's thumbnail
+      	// and open Imgur's own album embed instead
+      	var albumID = (api.match(/album\/([^\/]+)/) || [])[1];
+      	if( albumID ){
+      		shineGridEmbedPreview( $(target).first(), "", shineImgurAlbumEmbed( albumID ) );
+      	}
       },
       beforeSend: setHeader
     });
@@ -85,7 +90,7 @@ function getEntireAlbum(api){
       			captionDescription = captionDescription.replace('"',"'");
       		}
 
-      		$('.album-thumbnails').append('<img data-title="' + captionTitle + '" data-description="' + captionDescription + '" data-image="' + data.data[i].link + '" src="//i.imgur.com/' + data.data[i].id + 't.jpg" />');
+      		$('.album-thumbnails').append('<img data-title="' + shineEscapeHTML(captionTitle) + '" data-description="' + shineEscapeHTML(captionDescription) + '" data-image="' + data.data[i].link + '" src="//i.imgur.com/' + data.data[i].id + 't.jpg" />');
 
       	}
 
@@ -102,11 +107,11 @@ function getEntireAlbum(api){
       		$('.album-captions').html('<div class="show-captions"><svg version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" x="0px" y="0px" viewBox="-291 389 20 16" style="enable-background:new -291 389 20 16;" xml:space="preserve"><path d="M-273,389h-16c-1.1,0-2,0.9-2,2v12c0,1.1,0.9,2,2,2h16c1.1,0,2-0.9,2-2v-12C-271,389.9-271.9,389-273,389z M-289,397h4v2h-4V397z M-279,403h-10v-2h10V403z M-273,403h-4v-2h4V403z M-273,399h-10v-2h10V399z"/></svg></div><div class="caption-text"><strong></strong><p></p></div>');
 
       		if( data.data[0].title != null ){
-      			$('.caption-text strong').html(data.data[0].title);
+      			$('.caption-text strong').text(data.data[0].title);
       		}
 
       		if( data.data[0].description != null ){
-      			$('.caption-text p').html(data.data[0].description);
+      			$('.caption-text p').text(data.data[0].description);
       		}
 
       	}
@@ -157,24 +162,8 @@ function getVimeoThumbnail(vidID, target){
 // this gets our clips.twitch.tv thumbnail
 function getTwitchThumbnail(vidID, target){
 
-  $.ajax({
-      url: '//api.twitch.tv/kraken/clips/' + vidID,
-      type: 'GET',
-      headers: {
-       'Client-ID': 'wtf8dir4p97yu2eopunfrukdhs7myx',
-       'Accept': 'application/vnd.twitchtv.v5+json'
-      },
-      success: function(data) {
-
-        var twitchThumb = data.thumbnails.medium;
-
-        $(target).find('.preview-replace').replaceWith("<div class='preview preview-youtube' data-video='//clips.twitch.tv/embed?clip=" + vidID +"&autoplay=true' style='background-image:url(" + twitchThumb + ")'></div>");
-
-      },
-      error: function(request, status, message) {
-        console.log(message);
-      }
-    });
+	// Twitch's old (Kraken) API is gone; use reddit's thumbnail for the post
+	shineGridEmbedPreview( $(target).first(), "https://clips.twitch.tv/" + vidID );
 
 }
 
@@ -281,17 +270,7 @@ function getImageType(arrayBuffer){
 
 
 // this gets the ireddit picture url
-function getireddit(url, target){
-    
-    $(target).find('.preview-replace').load(url + " img.preview", function() {
-        
-        iredditUrl = $(this).find('img.preview').attr("src");
-                
-        $(this).replaceWith("<div data-url='" + iredditUrl + "' class='preview preview-image' style='background-image:url(" + iredditUrl + ")'></div>");
 
-    });
-    
-}
 
 
 
@@ -304,51 +283,15 @@ function getireddit(url, target){
 // this converts a regular old gif into a gfycat image
 function convertGiftoGfy(target, url){
 
-	$.ajax({
-      url: '//upload.gfycat.com/transcode?fetchUrl=' + url,
-      type: 'GET',
-      dataType: 'json',
-      success: function(data) {
-
-	     gfyID = data.gfyname;
-
-	     if( data.gfyname != undefined ){
-
-	     	$(target).find('.preview-replace').replaceWith("<div data-url='" + gfyID + "' class='preview preview-gfycat' style='background-image:url(//thumbs.gfycat.com/" + gfyID + "-poster.jpg)'></div>");
-
-	     }
-
-	  },
-      error: function(request, status, message) {
-      	console.log(message);
-      }
-    });
+	// Gfycat's transcoder shut down in 2023, so preview the gif itself
+	$(target).find('.preview-replace').replaceWith( $("<div class='preview preview-image'></div>").attr("data-url", url).css("background-image", "url(" + url + ")") );
 
 }
 
 function getCommentGfyCatURL(url, target){
 
-	$.ajax({
-      url: '//upload.gfycat.com/transcode?fetchUrl=' + url,
-      type: 'GET',
-      dataType: 'json',
-      success: function(data) {
-
-	     gfyID = data.gfyname;
-
-	     if( data.gfyname != undefined ){
-
-	     	$(target).attr("data-video", gfyID );
-
-	     	$(target).addClass("shine-comment comment-gfycat");
-
-	     }
-
-	  },
-      error: function(request, status, message) {
-      	console.log(message);
-      }
-    });
+	// Gfycat shut down in 2023; show the gif as an image
+	$(target).attr("data-image", url).addClass("shine-comment comment-image");
 
 }
 
@@ -390,30 +333,7 @@ function getRedditText(url, content, target){
 
 }
 
-function getvreddit(url, target){
 
-  $.ajax({
-    url:url,
-    type:'GET',
-    success: function(data){
-
-      if( $(data).filter('meta[property="og:image"]') != undefined  ){
-
-        $(target).find('.preview-replace').replaceWith("<div style='background-image:url(" + $(data).filter('meta[property="og:image"]').attr("content") + ")' class='preview preview-vreddit' data-video='" + $(data).find('a.thumbnail').attr('href') +"' />");
-
-        //$(target).find('.preview-text a').attr("target","_blank");
-
-      }else{
-
-        $(target).find('.preview-replace').remove();
-        $(target).addClass("nopreview");
-
-      }
-
-    }
-  });
-
-}
 
 
 
@@ -485,46 +405,9 @@ function getWikiContent(articleTitle, target){
 // getting the Sound Cloud embed
 function getSoundCloudContent(soundCloudURL, target){
 
-	$.ajax({
-      url: '//api.soundcloud.com/resolve.json?url=' + soundCloudURL + '&client_id=343c40e7fa565f9d2b89820a05bb3a8f',
-      type: 'GET',
-      dataType: 'jsonp',
-      success: function(data) {
-
-          embedID = "";
-
-          $.each(data, function(index, element) {
-
-            if(index == "id"){
-
-                    embedID = element;
-
-                }
-
-            });
-
-            if(soundCloudURL.toLowerCase().indexOf("in=") != -1){
-
-            	$(target).find('.preview-replace').replaceWith("<div class='preview preview-soundcloud'><iframe scrolling='no' frameborder='no' src='https://w.soundcloud.com/player/?url=https%3A//api.soundcloud.com/tracks/" + embedID + "&amp;auto_play=false&amp;hide_related=false&amp;visual=true'></iframe></div>");
-
-            }
-            else if(soundCloudURL.toLowerCase().indexOf("sets") != -1){
-
-            	$(target).find('.preview-replace').replaceWith("<div class='preview preview-soundcloud'><iframe scrolling='no' frameborder='no' src='https://w.soundcloud.com/player/?url=https%3A//api.soundcloud.com/playlists/" + embedID +  "&amp;auto_play=false&amp;hide_related=false&amp;visual=true'></iframe></div>");
-
-            }
-            else{
-
-            	$(target).find('.preview-replace').replaceWith("<div class='preview preview-soundcloud'><iframe scrolling='no' frameborder='no' src='https://w.soundcloud.com/player/?url=https%3A//api.soundcloud.com/tracks/" + embedID + "&amp;auto_play=false&amp;hide_related=false&amp;visual=true'></iframe></div>");
-
-            }
-
-     },
-     error: function(request, status, message) {
-      	console.log(message);
-      },
-      beforeSend: setHeader
-    });
+	// the SoundCloud widget takes the track/playlist URL directly; the old
+	// resolve API needed a client ID that no longer works
+	$(target).find('.preview-replace').replaceWith("<div class='preview preview-soundcloud'><iframe allow='autoplay; fullscreen; encrypted-media; picture-in-picture' scrolling='no' frameborder='no' src='" + shineSoundCloudEmbed( soundCloudURL ) + "'></iframe></div>");
 
 }
 
@@ -679,7 +562,7 @@ function createPreviews(theThings){
 
 		// setting up variables
 
-		url = $(theThings[i]).find('a.title').attr("href").replace(".httml","");
+		url = shineSafeURL( $(theThings[i]).find('a.title').attr("href") ).replace(".httml","");
 		extension = url.substr(url.lastIndexOf('.')+1);
 
 		// figuring out where to place our preview
@@ -712,8 +595,18 @@ function createPreviews(theThings){
 
 
 
+		// REDDIT VIDEO (v.redd.it), REDDIT GALLERIES, AND GIF HOSTS THAT SHUT DOWN
+		// previews and playback come from reddit's own post data
+		if( shineUsesRedditMedia( theThings[i], url ) ){
+
+			$(theThings[i]).find(whereToPlace).append("<div class='preview preview-replace'></div>");
+
+			shineGridRedditPreview( theThings[i] );
+
+		}
+
 		// IMGUR
-		if( url.toLowerCase().indexOf("imgur.com") != -1 && url.toLowerCase().indexOf("gifsound.com") == -1){
+		else if( url.toLowerCase().indexOf("imgur.com") != -1 && url.toLowerCase().indexOf("gifsound.com") == -1){
 
 			url = url.split(/[?#]/)[0]; // REMOVES QUERY STRING AND HASH
 
@@ -897,7 +790,7 @@ function createPreviews(theThings){
             }
             else{
 
-                vidID = getUrlVars(url)["v"];
+                vidID = shineYouTubeID(url) || getUrlVars(url)["v"];
 
                 timeStamp = getUrlVars(url)["t"];
                 timeStamp = getYouTubeTimeStamp(timeStamp);
@@ -916,33 +809,25 @@ function createPreviews(theThings){
       url = decodeURIComponent(url);
       shortcode = url.substr(url.toLowerCase().indexOf("streamable.com/") + 15);
 
-      $(theThings[i]).find(whereToPlace).append("<div style='background-image:url(//cdn-e2.streamable.com/image/"+ shortcode +".jpg)' class='preview preview-youtube' data-video='https://streamable.com/s/" + shortcode + "'></div>");
+      $(theThings[i]).find(whereToPlace).append("<div class='preview preview-replace'></div>");
+
+      shineGridEmbedPreview( theThings[i], url );
     }
 
 
     //CLIPS.TWITCH.TV INTEGRATION
-    else if( url.toLowerCase().indexOf("clips.twitch.tv") != -1 ){
-          vidID = url.substr(url.toLowerCase().indexOf("clips.twitch.tv/") + 16);
+    else if( shineTwitchClipEmbed( url ) ){
 
           $(theThings[i]).find(whereToPlace).append("<div class='preview preview-replace'></div>");
 
-          getTwitchThumbnail(vidID,  ".id-" + $(theThings[i]).attr("data-fullname"));
+          shineGridEmbedPreview( theThings[i], url );
 
           //$(theThings[i]).find(whereToPlace).append('<div class="preview preview-youtube" data-video="https://clips.twitch.tv/embed?clip=' + vidID + '&autoplay=true"></div>');
     }
 
 
     //v.redd.it
-    else if( $(theThings[i]).find('span.domain a').html() == "v.redd.it" ){
-      url = $(theThings[i]).find('a.comments').attr("href");
-      url = url.split(/[?#]/)[0]; // REMOVES QUERY STRING AND HASH
-
-      $(theThings[i]).find(whereToPlace).append("<div class='preview preview-replace'></div>");
-
-      getvreddit(url, ".id-" + $(theThings[i]).attr("data-fullname") );
-
-      //$(theThings[i]).find(whereToPlace).append("<div style='background-image:url("+ thumbVReddit +")' class='preview preview-youtube' data-video=''></div>");
-    }
+    
 
 
 
@@ -986,15 +871,7 @@ function createPreviews(theThings){
         
         
         // i.reddit.com uploads
-        else if( $(theThings[i]).find('span.domain a').html() == "i.redd.it" ){
-            
-            url = url.split(/[?#]/)[0]; // REMOVES QUERY STRING AND HASH
-            
-            $(theThings[i]).find(whereToPlace).append("<div class='preview preview-replace'></div>");
-            
-            getireddit( url, ".id-" + $(theThings[i]).attr("data-fullname") );
-            
-        }
+        
 
 
 
@@ -1254,7 +1131,7 @@ function checkSideComments(){
 
 		$(theSideCommentLinks[i]).attr("target","_blank");
 
-		url = $(theSideCommentLinks[i]).attr("href");
+		url = shineSafeURL( $(theSideCommentLinks[i]).attr("href") );
 
 		// it's an imgur link
 		if( url.toLowerCase().indexOf("imgur.com") != -1 && url.toLowerCase().indexOf("gifsound.com") == -1 && url.toLowerCase().indexOf("google.com") == -1 ){
@@ -1322,9 +1199,10 @@ function checkSideComments(){
 		// this is a gif we should convert to gifycat
 		else if( url.toLowerCase().indexOf(".gif") != -1 && url.toLowerCase().indexOf(".gifv") == -1 && url.toLowerCase().indexOf("/r/") == -1 ){
 
-			$(theSideCommentLinks[i]).addClass(".gfy-comment-" + i);
+			// show the gif itself (Gfycat's transcoder shut down in 2023)
+			$(theSideCommentLinks[i]).attr("data-image", url);
 
-			getCommentGfyCatURL(url, ".gfy-comment-" + i);
+			$(theSideCommentLinks[i]).addClass("shine-comment comment-image");
 
 		}
 
@@ -1364,7 +1242,7 @@ function checkSideComments(){
             }
             else{
 
-                vidID = getUrlVars(url)["v"];
+                vidID = shineYouTubeID(url) || getUrlVars(url)["v"];
 
             }
 
@@ -1393,23 +1271,7 @@ function checkSideComments(){
 		}
 
 		// this is a gfycat link
-		else if( url.toLowerCase().indexOf("gfycat.com") != -1 ){
-
-			url = url.split(/[?#]/)[0]; // REMOVES QUERY STRING AND HASH
-
-	        gfyID = url.substr(url.toLowerCase().indexOf("gfycat.com/") + 11);
-
-	        if( gfyID.indexOf(".webm") != -1 || gfyID.indexOf(".gifv") != -1 ){
-		        gfyID = gfyID.substring(0, gfyID.length - 5);
-	        }else if ( gfyID.indexOf(".ogg") != -1 || gfyID.indexOf(".ogv") != -1 || gfyID.indexOf(".mp4") != -1){
-	        	gfyID = gfyID.substring(0, gfyID.length - 4);
-	        }
-
-	        $(theSideCommentLinks[i]).attr("data-video", gfyID );
-
-			$(theSideCommentLinks[i]).addClass("shine-comment comment-gfycat");
-
-		}
+		
 
 		else{
 
@@ -1483,7 +1345,7 @@ $('body').on('click','.preview-youtube', function(){
 
 	resetInterfaces();
 
-	$('.shine-expand .large-youtube').html("<iframe frameborder='0' allowfullscreen src='" + $(this).data("video") + "' />");
+	$('.shine-expand .large-youtube').html("<iframe allow='autoplay; fullscreen; encrypted-media; picture-in-picture' frameborder='0' allowfullscreen src='" + $(this).data("video") + "' />");
 
 	loadSideComments( $('.shine-expand .side-comments'), $(this).parents('.thing').find('a.comments').attr("href") );
 
@@ -1494,49 +1356,17 @@ $('body').on('click','.preview-youtube', function(){
 
 });
 
-$('body').on('click','.preview-vreddit', function(){
+$('body').on('click','.preview-reddit', function(){
 
-  resetInterfaces();
+	resetInterfaces();
 
-  var posturl = $(this).parents('.thing').find('a.comments').attr("href");
+	loadSideComments( $('.shine-expand .side-comments'), $(this).parents('.thing').find('a.comments').attr("href") );
 
-  $.ajax({
-    url:posturl,
-    type:'GET',
-    success: function(data){
-
-      theContent = $(data).find(".media-preview-content");
-
-      $('.shine-expand').find('.large-youtube').html( theContent );
-      $('.no-constraints-when-pinned').removeAttr('style');
-      $('.reddit-video-player-root').css({
-        'position' : 'absolute',
-        'height' : '100%'
-      });
-    
-    }
-  });
-  
-  // theContent = $.get("//www.reddit.com" + url, function(data) {
-  //   $(data).find(".media-preview-content");
-  // });
-
-  // $('.shine-expand').find('.large-youtube').html(theContent);
-
-  // $('.no-constraints-when-pinned').removeAttr('style');
-  // $('.reddit-video-player-root').css({
-  //   'position' : 'absolute',
-  //   'height' : '100%'
-  // });
-
-  loadSideComments( $('.shine-expand .side-comments'), $(this).parents('.thing').find('a.comments').attr("href") );
-
-  $('html').addClass("expanding expand-youtubes");
-
-      $('.shine-expand').attr("data-original-type", "comments");
-      $('.shine-expand').attr("data-original-data", "comments");
+	shineGridOpenRedditMedia( $(this).attr("data-fullname") );
 
 });
+
+
 
 $('body').on('click','.preview-gifv', function(){
 
@@ -1572,7 +1402,7 @@ $('body').on('click','.preview-vimeo', function(){
 
 	resetInterfaces();
 
-	$('.shine-expand .large-youtube').html("<iframe frameborder='0' allowfullscreen src='" + $(this).data("video") + "' />");
+	$('.shine-expand .large-youtube').html("<iframe allow='autoplay; fullscreen; encrypted-media; picture-in-picture' frameborder='0' allowfullscreen src='" + $(this).data("video") + "' />");
 
 	loadSideComments( $('.shine-expand .side-comments'), $(this).parents('.thing').find('a.comments').attr("href") );
 
@@ -1615,11 +1445,11 @@ $('body').on('click','.album-thumbnails img', function(){
   		$('.album-captions').html('<div class="show-captions"><svg version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" x="0px" y="0px" viewBox="-291 389 20 16" style="enable-background:new -291 389 20 16;" xml:space="preserve"><path d="M-273,389h-16c-1.1,0-2,0.9-2,2v12c0,1.1,0.9,2,2,2h16c1.1,0,2-0.9,2-2v-12C-271,389.9-271.9,389-273,389z M-289,397h4v2h-4V397z M-279,403h-10v-2h10V403z M-273,403h-4v-2h4V403z M-273,399h-10v-2h10V399z"/></svg></div><div class="caption-text"><strong></strong><p></p></div>');
 
   		if( $(this).data("title") != "null" ){
-  			$('.caption-text strong').html($(this).data("title"));
+  			$('.caption-text strong').text($(this).data("title"));
   		}
 
   		if( $(this).data("description") != "null" ){
-  			$('.caption-text p').html($(this).data("description"));
+  			$('.caption-text p').text($(this).data("description"));
   		}
 
   	}
@@ -1639,6 +1469,10 @@ $('body').on('click','.show-captions',function(e){
 });
 
 $(document).keydown(function(e) {
+
+	if( $('html').hasClass("shine-no-keys") || $(e.target).is("input, textarea, select, [contenteditable], video, audio") ){
+		return;
+	}
 
     if( $('html').hasClass("expand-albums") ){
 
@@ -1772,7 +1606,7 @@ function getCommentAlbumImages( api ){
             captionDescription = captionDescription.replace('"',"'");
           }
 
-          $('.album-thumbnails').append('<img data-title="' + captionTitle + '" data-description="' + captionDescription + '" data-image="' + data.data[i].link + '" src="//i.imgur.com/' + data.data[i].id + 't.jpg" />');
+          $('.album-thumbnails').append('<img data-title="' + shineEscapeHTML(captionTitle) + '" data-description="' + shineEscapeHTML(captionDescription) + '" data-image="' + data.data[i].link + '" src="//i.imgur.com/' + data.data[i].id + 't.jpg" />');
 
         }
 
@@ -1789,11 +1623,11 @@ function getCommentAlbumImages( api ){
           $('.album-captions').html('<div class="show-captions"><svg version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" x="0px" y="0px" viewBox="-291 389 20 16" style="enable-background:new -291 389 20 16;" xml:space="preserve"><path d="M-273,389h-16c-1.1,0-2,0.9-2,2v12c0,1.1,0.9,2,2,2h16c1.1,0,2-0.9,2-2v-12C-271,389.9-271.9,389-273,389z M-289,397h4v2h-4V397z M-279,403h-10v-2h10V403z M-273,403h-4v-2h4V403z M-273,399h-10v-2h10V399z"/></svg></div><div class="caption-text"><strong></strong><p></p></div>');
 
           if( data.data[0].title != null ){
-            $('.caption-text strong').html(data.data[0].title);
+            $('.caption-text strong').text(data.data[0].title);
           }
 
           if( data.data[0].description != null ){
-            $('.caption-text p').html(data.data[0].description);
+            $('.caption-text p').text(data.data[0].description);
           }
 
         }
@@ -1858,7 +1692,7 @@ function replaceExpand(type,data,button){
 
 
 
-    $('.shine-expand .large-youtube').html("<iframe frameborder='0' allowfullscreen src='" + data + "' />");
+    $('.shine-expand .large-youtube').html("<iframe allow='autoplay; fullscreen; encrypted-media; picture-in-picture' frameborder='0' allowfullscreen src='" + data + "' />");
 
     $('html').addClass("expand-youtubes");
 
@@ -1876,6 +1710,10 @@ function replaceExpand(type,data,button){
 
 
 
+
+  }else if( type === "reddit"){
+
+    shineGridOpenRedditMedia( data );
 
   }else if( type === "gfycat"){
 

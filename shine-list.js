@@ -21,87 +21,24 @@ function getUrlVars(url) {
 
 
 // this gets the ireddit picture url
-function getireddit(target, url){
-    
-    $(target).find('.large-area').html('<div class="large-image"></div>');
-    $(target).find('.large-area .large-image').load(url + " img.preview", function() {
-        
-        iredditUrl = $(this).find('img.preview').attr("src");
-                
-        $(this).find('img.preview').remove();
 
-        $(this).attr("style", "background-image:url(" + iredditUrl + ");" );
-
-        $(this).zoom({url: iredditUrl, on: 'click'});
-
-        $(this).parents('.shine-expand').attr("data-original-type", "image");
-        $(this).parents('.shine-expand').attr("data-original-data", iredditUrl);
-
-    });
-    
-}
 
 
 // this converts a regular old gif into a gfycat image
 function convertGiftoGfy(target, url){
-	
-	$.ajax({
-      url: '//upload.gfycat.com/transcode?fetchUrl=' + url,
-      type: 'GET',
-      dataType: 'json',
-      success: function(data) { 
 
-      	if(data.mp4Url != undefined) {
+	// Gfycat's transcoder shut down in 2023, so show the gif itself
+	shineRenderImage( $(target).find('.large-area'), url );
 
-	     	$(target).find('.large-area').html("<div class='large-html5'><video controls preload='auto' autoplay='autoplay' muted='muted' loop='loop' webkit-playsinline ><source src='" + data.mp4Url +"' type='video/mp4' /></video></div>");
+	$(target).attr("data-original-type", "image");
+	$(target).attr("data-original-data", url);
 
-	     	$(target).attr("data-original-type", "gfycat");
-			$(target).attr("data-original-data", data.gfyname);
-
-		}else{
-
-	     	$(target).find('.large-area').html("<div class='large-youtube'><iframe src='https://gfycat.com/ifr/" + data.gfyname + "?theme=dark' frameborder='0' scrolling='yes' allowfullscreen /></div>");
-
-	     	$(target).attr("data-original-type", "gfycat");
-			$(target).attr("data-original-data", data.gfyname);
-
-		}
-	      
-	  },
-      error: function(request, status, message) { 
-      	console.log(message); 
-      }
-	
-	});		
-	
 }
+
+
 
 // this gets the GfyCatURL for our comment
-function getCommentGfyCatURL(url, target){
 
-	$.ajax({
-      url: '//upload.gfycat.com/transcode?fetchUrl=' + url,
-      type: 'GET',
-      dataType: 'json',
-      success: function(data) { 
-	     
-	     gfyID = data.gfyname;
-	     
-	     if( data.gfyname != undefined ){
-
-	     	$(target).attr("data-video", gfyID );
-
-	     	$(target).addClass("shine-comment comment-gfycat");
-	     
-	     }
-	      
-	  },
-      error: function(request, status, message) { 
-      	console.log(message); 
-      }
-    });	
-
-}
 
 // this gets the image type
 function getImageFromServer(path, id, target){
@@ -117,21 +54,25 @@ function getImageFromServer(path, id, target){
 			
 			if( imageType == "image/gif" ){
       
+				// Imgur serves gifs as mp4 too. The old code put the .gif into a
+				// <video> tag, which browsers can't play (the "black gif" bug), and
+				// checked for the mp4 over http, which https pages block.
 				$.ajax({
-				    url: 'http://i.imgur.com/' + id + '.mp4',
+				    url: 'https://i.imgur.com/' + id + '.mp4',
 				    type: 'HEAD',
 				    error: function()
 				    {
-						$(target).find('.large-area').html('<div class="large-html5"><video controls preload="auto" autoplay="autoplay" muted="muted" loop="loop" webkit-playsinline ><source src="//i.imgur.com/' + id + '.gif" /></video></div>');
+						shineRenderImage( $(target).find('.large-area'), 'https://i.imgur.com/' + id + '.gif' );
+						$(target).attr("data-original-type", "image");
+						$(target).attr("data-original-data", 'https://i.imgur.com/' + id + '.gif');
 				    },
 				    success: function ()
 				    {
-						$(target).find('.large-area').html('<div class="large-html5"><video controls preload="auto" autoplay="autoplay" muted="muted" loop="loop" webkit-playsinline ><source src="//i.imgur.com/' + id + '.gif" /></video></div>');
+						shineRenderVideo( $(target).find('.large-area'), { mp4: 'https://i.imgur.com/' + id + '.mp4', silent: true } );
+						$(target).attr("data-original-type", "html5");
+						$(target).attr("data-original-data", 'https://i.imgur.com/' + id + '.mp4');
 				    }
 				});
-
-				$(target).attr("data-original-type", "html5");
-				$(target).attr("data-original-data", '//i.imgur.com/' + id + '.gif');
 				
 			}else{
 
@@ -275,7 +216,7 @@ function checkSideComments(){
 
 		$(theSideCommentLinks[i]).attr("target","_blank");
 
-		url = $(theSideCommentLinks[i]).attr("href");
+		url = shineSafeURL( $(theSideCommentLinks[i]).attr("href") );
 
 		// it's an imgur link
 		if( url.toLowerCase().indexOf("imgur.com") != -1 && url.toLowerCase().indexOf("gifsound.com") == -1 && url.toLowerCase().indexOf("google.com") == -1 ){
@@ -343,9 +284,10 @@ function checkSideComments(){
 		// this is a gif we should convert to gifycat
 		else if( url.toLowerCase().indexOf(".gif") != -1 && url.toLowerCase().indexOf(".gifv") == -1 && url.toLowerCase().indexOf("/r/") == -1 ){
 
-			$(theSideCommentLinks[i]).addClass(".gfy-comment-" + i);
+			// show the gif itself (Gfycat's transcoder shut down in 2023)
+			$(theSideCommentLinks[i]).attr("data-image", url);
 
-			getCommentGfyCatURL(url, ".gfy-comment-" + i);
+			$(theSideCommentLinks[i]).addClass("shine-comment comment-image");
 
 		}
         
@@ -384,7 +326,7 @@ function checkSideComments(){
             }
             else{
             
-                vidID = getUrlVars(url)["v"];
+                vidID = shineYouTubeID(url) || getUrlVars(url)["v"];
                                 
             }
             
@@ -590,9 +532,17 @@ $('body').on('click','div.content div#siteTable.linklisting > .thing:not(.shine-
 
 		// time to decide what kind of link this is
 		url = $(this).find('a.title').attr("data-shine-url");
-        
+
+		// REDDIT VIDEO (v.redd.it), REDDIT GALLERIES, AND GIF HOSTS THAT SHUT DOWN
+		// these use the media reddit keeps for the post itself
+		if( shineUsesRedditMedia( theLink, url ) ){
+
+			shineShowRedditMediaIn( theExpand, $(theLink).data("fullname"), url );
+
+		}
+
 		// IMGUR
-		if( url.toLowerCase().indexOf("imgur.com") != -1 && url.toLowerCase().indexOf("gifsound.com") == -1){
+		else if( url.toLowerCase().indexOf("imgur.com") != -1 && url.toLowerCase().indexOf("gifsound.com") == -1){
 
 			url = url.split(/[?#]/)[0]; // REMOVES QUERY STRING AND HASH
 
@@ -628,7 +578,7 @@ $('body').on('click','div.content div#siteTable.linklisting > .thing:not(.shine-
 				      			captionDescription = captionDescription.replace('"',"'");
       						}
 
-      						$(theExpand).find('.album-thumbnails').append('<img data-title="' + captionTitle + '" data-description="' + captionDescription + '" data-image="' + data.data[i].link + '" src="//i.imgur.com/' + data.data[i].id + 't.jpg" />');
+      						$(theExpand).find('.album-thumbnails').append('<img data-title="' + shineEscapeHTML(captionTitle) + '" data-description="' + shineEscapeHTML(captionDescription) + '" data-image="' + data.data[i].link + '" src="//i.imgur.com/' + data.data[i].id + 't.jpg" />');
 
 				      	}
 
@@ -643,11 +593,11 @@ $('body').on('click','div.content div#siteTable.linklisting > .thing:not(.shine-
 				      		$(theExpand).find('.album-captions').html('<div class="show-captions"><svg version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" x="0px" y="0px" viewBox="-291 389 20 16" style="enable-background:new -291 389 20 16;" xml:space="preserve"><path d="M-273,389h-16c-1.1,0-2,0.9-2,2v12c0,1.1,0.9,2,2,2h16c1.1,0,2-0.9,2-2v-12C-271,389.9-271.9,389-273,389z M-289,397h4v2h-4V397z M-279,403h-10v-2h10V403z M-273,403h-4v-2h4V403z M-273,399h-10v-2h10V399z"/></svg></div><div class="caption-text"><strong></strong><p></p></div>');
 
 				      		if( data.data[0].title != null ){
-				      			$(theExpand).find('.caption-text strong').html(data.data[0].title);
+				      			$(theExpand).find('.caption-text strong').text(data.data[0].title);
 				      		}
 
 				      		if( data.data[0].description != null ){
-				      			$(theExpand).find('.caption-text p').html(data.data[0].description);	
+				      			$(theExpand).find('.caption-text p').text(data.data[0].description);	
 				      		}
 
 				      	}
@@ -656,8 +606,11 @@ $('body').on('click','div.content div#siteTable.linklisting > .thing:not(.shine-
 				      	$(theExpand).attr("data-original-data", "https://api.imgur.com/3/album/" + albumID + "/images");
 
 			      },
-			      error: function(request, status, message) { 
-			      	console.log(message); 
+			      error: function(request, status, message) {
+			      	// the shared Imgur API key is often rate limited; fall back to Imgur's own embed
+			      	shineRenderIframe( $(theExpand).find('.large-area'), shineImgurAlbumEmbed( albumID ) );
+			      	$(theExpand).attr("data-original-type", "youtube");
+			      	$(theExpand).attr("data-original-data", shineImgurAlbumEmbed( albumID ));
 			      },
 			      beforeSend: setHeader
 			    });
@@ -721,7 +674,7 @@ $('body').on('click','div.content div#siteTable.linklisting > .thing:not(.shine-
                                             captionDescription = captionDescription.replace('"',"'");
                                         }
 
-                                        $(theExpand).find('.album-thumbnails').append('<img data-title="' + captionTitle + '" data-description="' + captionDescription + '" data-image="' + data.data[i].link + '" src="//i.imgur.com/' + data.data[i].id + 't.jpg" />');
+                                        $(theExpand).find('.album-thumbnails').append('<img data-title="' + shineEscapeHTML(captionTitle) + '" data-description="' + shineEscapeHTML(captionDescription) + '" data-image="' + data.data[i].link + '" src="//i.imgur.com/' + data.data[i].id + 't.jpg" />');
 
                                     }
 
@@ -736,11 +689,11 @@ $('body').on('click','div.content div#siteTable.linklisting > .thing:not(.shine-
                                         $(theExpand).find('.album-captions').html('<div class="show-captions"><svg version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" x="0px" y="0px" viewBox="-291 389 20 16" style="enable-background:new -291 389 20 16;" xml:space="preserve"><path d="M-273,389h-16c-1.1,0-2,0.9-2,2v12c0,1.1,0.9,2,2,2h16c1.1,0,2-0.9,2-2v-12C-271,389.9-271.9,389-273,389z M-289,397h4v2h-4V397z M-279,403h-10v-2h10V403z M-273,403h-4v-2h4V403z M-273,399h-10v-2h10V399z"/></svg></div><div class="caption-text"><strong></strong><p></p></div>');
 
                                         if( data.data[0].title != null ){
-                                            $(theExpand).find('.caption-text strong').html(data.data[0].title);
+                                            $(theExpand).find('.caption-text strong').text(data.data[0].title);
                                         }
 
                                         if( data.data[0].description != null ){
-                                            $(theExpand).find('.caption-text p').html(data.data[0].description);	
+                                            $(theExpand).find('.caption-text p').text(data.data[0].description);	
                                         }
 
                                     }
@@ -769,7 +722,8 @@ $('body').on('click','div.content div#siteTable.linklisting > .thing:not(.shine-
                       
                   },
 			      error: function(request, status, message) { 
-			      	console.log(message); 
+			      	// shared Imgur API key rate limited: use Imgur's own embed
+			      	shineRenderIframe( $(theExpand).find('.large-area'), shineImgurAlbumEmbed( galleryID ) );
 			      },
 			      beforeSend: setHeader
 			    });
@@ -921,14 +875,14 @@ $('body').on('click','div.content div#siteTable.linklisting > .thing:not(.shine-
             }
             else{
             
-                vidID = getUrlVars(url)["v"];
+                vidID = shineYouTubeID(url) || getUrlVars(url)["v"];
                                 
             }
             
             timeStamp = getUrlVars(url)["t"];
             timeStamp = getYouTubeTimeStamp(timeStamp);
 
-            $(theExpand).find(".large-area").html('<div class="large-youtube"><iframe frameborder="0" allowfullscreen src="//www.youtube.com/embed/' + vidID + '?rel=0&autoplay=1&vq=hd1080&wmode=transparent&start=' + timeStamp + '" /></div>');
+            $(theExpand).find(".large-area").html('<div class="large-youtube"><iframe allow="autoplay; fullscreen; encrypted-media; picture-in-picture" frameborder="0" allowfullscreen src="//www.youtube.com/embed/' + vidID + '?rel=0&autoplay=1&vq=hd1080&wmode=transparent&start=' + timeStamp + '" /></div>');
 
             $(theExpand).attr("data-original-type", "youtube");
 			$(theExpand).attr("data-original-data", '//www.youtube.com/embed/' + vidID + '?rel=0&autoplay=1&vq=hd1080&wmode=transparent&start=' + timeStamp);
@@ -938,25 +892,23 @@ $('body').on('click','div.content div#siteTable.linklisting > .thing:not(.shine-
 
 		//STREAMABLE INTEGRATION BY u/itzblitz94
 		else if( url.toLowerCase().indexOf("streamable.com") != -1 ){
-      		url = url.split(/[?#]/)[0]; // REMOVES QUERY STRING AND HASH
-			url = decodeURIComponent(url);
-      		vidID = url.substr(url.toLowerCase().indexOf("streamable.com/") + 15);
+      		embedURL = shineStreamableEmbed( url );
 
-      		$(theExpand).find(".large-area").html('<div class="large-youtube"><iframe frameborder="0" allowfullscreen src="https://streamable.com/s/' + vidID + '?autoplay=1" /></div>');
+      		shineRenderIframe( $(theExpand).find(".large-area"), embedURL );
 
-      		$(theExpand).attr("data-original-type", "streamable");
-			$(theExpand).attr("data-original-data", '//streamable.com/s/' + vidID);
+      		$(theExpand).attr("data-original-type", "youtube");
+			$(theExpand).attr("data-original-data", embedURL);
 		}
 
 
-		//CLIPS.TWITCH.TV INTEGRATION
-		else if( url.toLowerCase().indexOf("clips.twitch.tv") != -1 ){
-      		vidID = url.substr(url.toLowerCase().indexOf("clips.twitch.tv/") + 16);
+		//TWITCH CLIPS (clips.twitch.tv/slug and twitch.tv/channel/clip/slug)
+		else if( shineTwitchClipEmbed( url ) ){
+      		embedURL = shineTwitchClipEmbed( url );
 
-      		$(theExpand).find(".large-area").html('<div class="large-youtube"><iframe frameborder="0" allowfullscreen="true" src="https://clips.twitch.tv/embed?clip=' + vidID + '&autoplay=true" /></div>');
+      		shineRenderIframe( $(theExpand).find(".large-area"), embedURL );
 
-      		$(theExpand).attr("data-original-type", "twitch");
-			$(theExpand).attr("data-original-data", '//clips.twitch.tv/embed?clip=' + vidID + '&autoplay=true');
+      		$(theExpand).attr("data-original-type", "youtube");
+			$(theExpand).attr("data-original-data", embedURL);
 		}
 
 
@@ -968,7 +920,7 @@ $('body').on('click','div.content div#siteTable.linklisting > .thing:not(.shine-
 		else if( url.toLowerCase().indexOf("pornhub.com") != -1 ){
       		vidID = url.substr(url.toLowerCase().indexOf("?viewkey=") + 9);
 
-      		$(theExpand).find(".large-area").html('<div class="large-youtube"><iframe src="//www.pornhub.com/embed/' + vidID + '" frameborder="0" width="560" height="315" scrolling="no" allowfullscreen autoplay /></div>');
+      		$(theExpand).find(".large-area").html('<div class="large-youtube"><iframe allow="autoplay; fullscreen; encrypted-media; picture-in-picture" src="//www.pornhub.com/embed/' + vidID + '" frameborder="0" width="560" height="315" scrolling="no" allowfullscreen autoplay /></div>');
 
       		$(theExpand).attr("data-original-type", "pornhub");
 			$(theExpand).attr("data-original-data", '//www.pornhub.com/embed/' + vidID);
@@ -978,7 +930,7 @@ $('body').on('click','div.content div#siteTable.linklisting > .thing:not(.shine-
 		else if( url.toLowerCase().indexOf("xhamster.com") != -1 ){
       		vidID = url.substr(url.toLowerCase().lastIndexOf("-") + 1);
 
-      		$(theExpand).find(".large-area").html('<div class="large-youtube"><iframe src="//xhamster.com/xembed.php?video=' + vidID + '" frameborder="0" width="560" height="315" scrolling="no" allowfullscreen autoplay /></div>');
+      		$(theExpand).find(".large-area").html('<div class="large-youtube"><iframe allow="autoplay; fullscreen; encrypted-media; picture-in-picture" src="//xhamster.com/xembed.php?video=' + vidID + '" frameborder="0" width="560" height="315" scrolling="no" allowfullscreen autoplay /></div>');
 
       		$(theExpand).attr("data-original-type", "xhamster");
 			$(theExpand).attr("data-original-data", '//xhamster.com/xembed.php?video=' + vidID);
@@ -989,7 +941,7 @@ $('body').on('click','div.content div#siteTable.linklisting > .thing:not(.shine-
       		vidID = url.substr(url.toLowerCase().indexOf("/video") + 6);
       		vidID = vidID.substr('-'+vidID.length,vidID.indexOf("/") + 1);
 
-      		$(theExpand).find(".large-area").html('<div class="large-youtube"><iframe src="//flashservice.xvideos.com/embedframe/' + vidID + '" frameborder="0" scrolling="no" allowfullscreen="allowfullscreen" /></div>');
+      		$(theExpand).find(".large-area").html('<div class="large-youtube"><iframe allow="autoplay; fullscreen; encrypted-media; picture-in-picture" src="//flashservice.xvideos.com/embedframe/' + vidID + '" frameborder="0" scrolling="no" allowfullscreen="allowfullscreen" /></div>');
 
       		$(theExpand).attr("data-original-type", "xvideos");
 			$(theExpand).attr("data-original-data", '//flashservice.xvideos.com/embedframe/' + vidID);
@@ -1005,7 +957,7 @@ $('body').on('click','div.content div#siteTable.linklisting > .thing:not(.shine-
             timeStamp = getUrlVars(url)["t"];
             timeStamp = getYouTubeTimeStamp(timeStamp);
 
-			$(theExpand).find(".large-area").html('<div class="large-youtube"><iframe frameborder="0" allowfullscreen src="//www.youtube.com/embed/' + vidID + '?rel=0&autoplay=1&vq=hd1080&wmode=transparent&start=' + timeStamp + '" /></div>');
+			$(theExpand).find(".large-area").html('<div class="large-youtube"><iframe allow="autoplay; fullscreen; encrypted-media; picture-in-picture" frameborder="0" allowfullscreen src="//www.youtube.com/embed/' + vidID + '?rel=0&autoplay=1&vq=hd1080&wmode=transparent&start=' + timeStamp + '" /></div>');
 
 			$(theExpand).attr("data-original-type", "youtube");
 			$(theExpand).attr("data-original-data", '//www.youtube.com/embed/' + vidID + '?rel=0&autoplay=1&vq=hd1080&wmode=transparent&start=' + timeStamp);
@@ -1025,7 +977,7 @@ $('body').on('click','div.content div#siteTable.linklisting > .thing:not(.shine-
 
 			vidID = url.substr(url.toLowerCase().indexOf("vimeo.com/") + 10);
 
-			$(theExpand).find(".large-area").html('<div class="large-youtube"><iframe frameborder="0" allowfullscreen src="//player.vimeo.com/video/' + vidID + '?autoplay=1" /></div>');
+			$(theExpand).find(".large-area").html('<div class="large-youtube"><iframe allow="autoplay; fullscreen; encrypted-media; picture-in-picture" frameborder="0" allowfullscreen src="//player.vimeo.com/video/' + vidID + '?autoplay=1" /></div>');
 
 			$(theExpand).attr("data-original-type", "youtube");
 			$(theExpand).attr("data-original-data", '//player.vimeo.com/video/' + vidID + '?autoplay=1');
@@ -1040,96 +992,21 @@ $('body').on('click','div.content div#siteTable.linklisting > .thing:not(.shine-
         else if( url.toLowerCase().indexOf("soundcloud.com") != -1 ){
 
 
-	        url = url.split(/[?#]/)[0]; // REMOVES QUERY STRING AND HASH
+	        // the SoundCloud widget takes the track/playlist URL directly; the old
+	        // resolve API needed a client ID that no longer works
+	        soundCloudEmbed = shineSoundCloudEmbed( url );
 
-        	$.ajax({
-		      url: '//api.soundcloud.com/resolve.json?url=' + url + '&client_id=343c40e7fa565f9d2b89820a05bb3a8f',
-		      type: 'GET',
-		      dataType: 'jsonp',
-		      success: function(data) { 
-		        
-		          embedID = "";  
-		        
-		          $.each(data, function(index, element) {
-		                
-		            if(index == "id"){
-		                    
-		                    embedID = element;
-		            
-		                }
-		                
-		            });          
-		          
-		            if(url.toLowerCase().indexOf("in=") != -1){
-		                      
-		            	$(theExpand).find('.large-area').html("<div class='large-soundcloud'><iframe scrolling='no' frameborder='no' src='https://w.soundcloud.com/player/?url=https%3A//api.soundcloud.com/tracks/" + embedID + "&amp;auto_play=false&amp;hide_related=false&amp;visual=true'></iframe></div>");
+	        $(theExpand).find('.large-area').html("<div class='large-soundcloud'><iframe allow='autoplay; fullscreen; encrypted-media; picture-in-picture' scrolling='no' frameborder='no' src='" + soundCloudEmbed + "'></iframe></div>");
 
-		            	$(theExpand).attr("data-original-type", "soundcloud");
-						$(theExpand).attr("data-original-data", 'https://w.soundcloud.com/player/?url=https%3A//api.soundcloud.com/tracks/' + embedID + '&amp;auto_play=false&amp;hide_related=false&amp;visual=true');
-		                                
-		            }
-		            else if(url.toLowerCase().indexOf("sets") != -1){
-
-		            	$(theExpand).find('.large-area').html("<div class='large-soundcloud'><iframe scrolling='no' frameborder='no' src='https://w.soundcloud.com/player/?url=https%3A//api.soundcloud.com/playlists/" + embedID +  "&amp;auto_play=false&amp;hide_related=false&amp;visual=true'></iframe></div>");
-
-		            	$(theExpand).attr("data-original-type", "soundcloud");
-						$(theExpand).attr("data-original-data", 'https://w.soundcloud.com/player/?url=https%3A//api.soundcloud.com/playlists/' + embedID +  '&amp;auto_play=false&amp;hide_related=false&amp;visual=true');
-		                                
-		            }
-		            else{  
-
-		            	$(theExpand).find('.large-area').html("<div class='large-soundcloud'><iframe scrolling='no' frameborder='no' src='https://w.soundcloud.com/player/?url=https%3A//api.soundcloud.com/tracks/" + embedID + "&amp;auto_play=false&amp;hide_related=false&amp;visual=true'></iframe></div>");
-
-		            	$(theExpand).attr("data-original-type", "soundcloud");
-						$(theExpand).attr("data-original-data", 'https://w.soundcloud.com/player/?url=https%3A//api.soundcloud.com/tracks/' + embedID + '&amp;auto_play=false&amp;hide_related=false&amp;visual=true');
-		                
-		            }                                                                                                       
-
-		     },
-		     error: function(request, status, message) { 
-		      	console.log(message); 
-		      },
-		      beforeSend: setHeader
-		    });
+	        $(theExpand).attr("data-original-type", "youtube");
+			$(theExpand).attr("data-original-data", soundCloudEmbed);
 
             
         }
 
 
 
-        //GFYCAT
-        else if( url.toLowerCase().indexOf("gfycat.com") != -1 ){
-
-
-	        url = url.split(/[?#]/)[0]; // REMOVES QUERY STRING AND HASH
-
-	        gfyRegex = /([^/]+$)/;
-	        gfyID = gfyRegex.exec(url);
-	        
-	        /*if( gfyID.indexOf(".webm") != -1 || gfyID.indexOf(".gifv") != -1 ){
-		        gfyID = gfyID.substring(0, gfyID.length - 5);
-	        }else if ( gfyID.indexOf(".ogg") != -1 || gfyID.indexOf(".ogv") != -1 || gfyID.indexOf(".mp4") != -1){
-	        	gfyID = gfyID.substring(0, gfyID.length - 4);
-	        }*/
-            
-			$(theExpand).find('.large-area').html("<div class='large-youtube'><iframe src='https://gfycat.com/ifr/" + gfyID[1] + "?theme=dark' frameborder='0' scrolling='yes' allowfullscreen /></div>");
-
-			$(theExpand).attr("data-original-type", "gfycat");
-			$(theExpand).attr("data-original-data", gfyID[1]);
-	        
-        }
-
-
-
-        
-        //i.redd.it POSTS
-        else if( $(theLink).find('span.domain a').html() == "i.redd.it" ){
-
-			url = url.split(/[?#]/)[0]; // REMOVES QUERY STRING AND HASH
-
-			getireddit( theExpand, url );
-                        
-        }
+        // (gfycat, v.redd.it and i.redd.it are handled at the top by shineUsesRedditMedia)
         
         
 
@@ -1161,35 +1038,6 @@ $('body').on('click','div.content div#siteTable.linklisting > .thing:not(.shine-
 		}
 
 
-		//V.REDD.IT
-        else if( $(theLink).find('span.domain a').html() == "v.redd.it" ){
-
-	        url = url.split(/[?#]/)[0]; // REMOVES QUERY STRING AND HASH
-
-
-	        $.ajax({
-				url:url,
-				type:'GET',
-				success: function(data){
-
-					theContent = $(data).find(".media-preview-content");
-
-					$(theExpand).find('.large-area').html( theContent );
-					$('.no-constraints-when-pinned').removeAttr('style');
-					$('.reddit-video-player-root').css({
-						'position' : 'absolute',
-						'height' : '100%'
-					});
-				
-				}
-			});
-
-	        $(theExpand).attr("data-original-type", "comments");
-			$(theExpand).attr("data-original-data", "comments");
-            
-		}
-        
-        
 
 /*
 		//REDDIT WIKI
@@ -1307,11 +1155,11 @@ $('body').on('click','.album-thumbnails img', function(){
   		$(this).parents('.shine-expand').find('.album-captions').html('<div class="show-captions"><svg version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" x="0px" y="0px" viewBox="-291 389 20 16" style="enable-background:new -291 389 20 16;" xml:space="preserve"><path d="M-273,389h-16c-1.1,0-2,0.9-2,2v12c0,1.1,0.9,2,2,2h16c1.1,0,2-0.9,2-2v-12C-271,389.9-271.9,389-273,389z M-289,397h4v2h-4V397z M-279,403h-10v-2h10V403z M-273,403h-4v-2h4V403z M-273,399h-10v-2h10V399z"/></svg></div><div class="caption-text"><strong></strong><p></p></div>');
 
   		if( $(this).data("title") != "null" ){
-  			$(this).parents('.shine-expand').find('.caption-text strong').html($(this).data("title"));
+  			$(this).parents('.shine-expand').find('.caption-text strong').text($(this).data("title"));
   		}
 
   		if( $(this).data("description") != "null" ){
-  			$(this).parents('.shine-expand').find('.caption-text p').html($(this).data("description"));	
+  			$(this).parents('.shine-expand').find('.caption-text p').text($(this).data("description"));	
   		}
 
   	}
@@ -1338,6 +1186,10 @@ $('body').on('click','.large-area', function(){
 });
 
 $(document).keydown(function(e) {
+
+	if( $('html').hasClass("shine-no-keys") || $(e.target).is("input, textarea, select, [contenteditable], video, audio") ){
+		return;
+	}
 
     if( $('.active-album').length != -1 ){
 
@@ -1451,7 +1303,7 @@ function getCommentAlbumImages( api, target ){
       			captionDescription = captionDescription.replace('"',"'");
 			}
 
-			$(target).find('.album-thumbnails').append('<img data-title="' + captionTitle + '" data-description="' + captionDescription + '" data-image="' + data.data[i].link + '" src="//i.imgur.com/' + data.data[i].id + 't.jpg" />');
+			$(target).find('.album-thumbnails').append('<img data-title="' + shineEscapeHTML(captionTitle) + '" data-description="' + shineEscapeHTML(captionDescription) + '" data-image="' + data.data[i].link + '" src="//i.imgur.com/' + data.data[i].id + 't.jpg" />');
 
       	}
 
@@ -1466,11 +1318,11 @@ function getCommentAlbumImages( api, target ){
       		$(target).find('.album-captions').html('<div class="show-captions"><svg version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" x="0px" y="0px" viewBox="-291 389 20 16" style="enable-background:new -291 389 20 16;" xml:space="preserve"><path d="M-273,389h-16c-1.1,0-2,0.9-2,2v12c0,1.1,0.9,2,2,2h16c1.1,0,2-0.9,2-2v-12C-271,389.9-271.9,389-273,389z M-289,397h4v2h-4V397z M-279,403h-10v-2h10V403z M-273,403h-4v-2h4V403z M-273,399h-10v-2h10V399z"/></svg></div><div class="caption-text"><strong></strong><p></p></div>');
 
       		if( data.data[0].title != null ){
-      			$(target).find('.caption-text strong').html(data.data[0].title);
+      			$(target).find('.caption-text strong').text(data.data[0].title);
       		}
 
       		if( data.data[0].description != null ){
-      			$(target).find('.caption-text p').html(data.data[0].description);	
+      			$(target).find('.caption-text p').text(data.data[0].description);	
       		}
 
       	}
@@ -1520,7 +1372,7 @@ function replaceExpand(type,data,button){
 
 
 
-    $(button).parents(".shine-expand").find(".large-area").html('<div class="large-youtube"><iframe frameborder="0" allowfullscreen src="' + data + '" /></div>');
+    $(button).parents(".shine-expand").find(".large-area").html('<div class="large-youtube"><iframe allow="autoplay; fullscreen; encrypted-media; picture-in-picture" frameborder="0" allowfullscreen src="' + data + '" /></div>');
 
 
 
@@ -1548,6 +1400,10 @@ function replaceExpand(type,data,button){
   }else if( type === "album"){
 
     getCommentAlbumImages( data, $(button).parents(".shine-expand") );
+
+  }else if( type === "reddit"){
+
+    shineShowRedditMediaIn( $(button).parents(".shine-expand"), data, "" );
 
   }
 
@@ -1664,7 +1520,7 @@ $('body').on('blur','input, textarea', function(){
 // RES Keyboard Navigation and closing posts
 $(document).on('keyup keydown', function(e){
 	
-	if(e.shiftKey && !$('html').hasClass("disable-shift")){
+	if(e.shiftKey && !$('html').hasClass("disable-shift") && !$('html').hasClass("shine-no-keys") && !$(e.target).is("input, textarea, select, [contenteditable]")){
 		$('.RES-keyNav-activeElement').parents('.thing').click();
 	}
 
@@ -1683,7 +1539,7 @@ function shineHREF(n){
 
 	for( i =  0; i < theShinedThings.length; i++){
 
-		$(theShinedThings[i]).find('a.title').attr("data-shine-url", $(theShinedThings[i]).find('a.title').attr("href"));
+		$(theShinedThings[i]).find('a.title').attr("data-shine-url", shineSafeURL( $(theShinedThings[i]).find('a.title').attr("href") ));
 
 		$(theShinedThings[i]).addClass("shined-thing");
 		if( !$('body').hasClass('res') ){

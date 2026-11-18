@@ -298,6 +298,7 @@ html.SHINE.shine-grid body > .content #siteTable .thing .score{
     vertical-align: top;
 }
 
+html.SHINE.shine-grid .preview-reddit,
 html.SHINE.shine-grid .preview-image,
 html.SHINE.shine-grid .preview-album,
 html.SHINE.shine-grid .preview-gifv,
@@ -310,6 +311,7 @@ html.SHINE.shine-grid .preview-wikipedia {
 
 html.SHINE.shine-grid .preview-youtube::after,
 html.SHINE.shine-grid .preview-vreddit::after,
+html.SHINE.shine-grid .preview-reddit-video::after,
 html.SHINE.shine-grid .preview-vimeo::after{
     content:'';
     display:block;
@@ -339,6 +341,7 @@ html.SHINE.shine-grid .preview-gfycat::after{
     background-size:75px auto;
 }
 
+html.SHINE.shine-grid .preview-reddit-gallery::after,
 html.SHINE.shine-grid .preview-album::after{
     content:'';
     display:block;

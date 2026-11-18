@@ -2395,3 +2395,21 @@ html.SHINE #header ul.tabmenu li.res-toggle-filterline-visibility {
 html.SHINE #header ul.tabmenu:hover li.res-toggle-filterline-visibility {
     display: inline-block;
 }
+
+/* 2.0 fork: message shown when media cannot be loaded */
+html.SHINE .shine-media-message {
+    padding: 30px 20px;
+    text-align: center;
+    color: #ddd;
+    background: #222;
+    font-size: 14px;
+}
+
+html.SHINE .shine-media-message a {
+    color: #8cf;
+    text-decoration: underline;
+}
+
+html.SHINE .large-html5 video {
+    background: #000;
+}

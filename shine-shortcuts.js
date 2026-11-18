@@ -68,10 +68,16 @@ $('body').on('click','.shine-comment-prev', function(){
 
 // KEY SHORTCUTS
 $('body').keyup(function (e) {
-    if (e.target.nodeName.toLowerCase() !== 'input' && e.target.nodeName.toLowerCase() !== 'textarea') {
+    if (!$(e.target).is("input, textarea, select, [contenteditable], video, audio") && !e.ctrlKey && !e.altKey && !e.metaKey) {
+		if (e.keyCode != 27 && $('html').hasClass("shine-no-keys")) {
+			return;
+		}
 		switch( e.keyCode ) {
 		case 27:
-	     	resetInterfaces();
+			// resetInterfaces only exists when the list or grid view is loaded
+			if (typeof resetInterfaces === "function") {
+				resetInterfaces();
+			}
 	     	break;
 		case 39:
 			commentScroller('next');

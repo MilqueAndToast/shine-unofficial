@@ -1,5 +1,55 @@
-// GLOBAL RESETS AND FIXES 
+// GLOBAL RESETS AND FIXES
 $('body').removeClass("listing-chooser-collapsed");
+
+// MODERN BROWSER HELPERS
+
+// Ask the service worker to run scripts in the page's own JavaScript world.
+// Old reddit already ships jQuery there, and the list/grid views use it.
+// Scripts run in the order given.
+function shineInjectMain(files, callback){
+	chrome.runtime.sendMessage({ type: "shine-inject-main", files: files }, function(response){
+		if( chrome.runtime.lastError || !response || !response.ok ){
+			console.warn("SHINE: could not load " + files.join(", "), chrome.runtime.lastError || (response && response.error));
+		}
+		if( callback ){
+			callback(response && response.ok);
+		}
+	});
+}
+
+// The page-world scripts can ask for the HLS player (used for v.redd.it video
+// with sound in browsers without native HLS support).
+window.addEventListener("message", function(e){
+	if( e.source !== window || !e.data || e.data.shine !== "load-hls" ){
+		return;
+	}
+	shineInjectMain(["hls.light.min.js"], function(ok){
+		window.postMessage({ shine: "hls-loaded", ok: !!ok }, "*");
+	});
+});
+
+// Saved subreddit/multireddit defaults used to store "www.reddit.com/r/foo/".
+// Compare by path only so they work on old.reddit.com and any other host.
+function shineNormalizeRedditURL(url){
+	if( !url ){
+		return "";
+	}
+	url = url.toLowerCase().replace(/^https?:\/\//, "").replace(/^([a-z0-9-]+\.)*reddit\.com/, "");
+	url = url.split(/[?#]/)[0];
+	if( url.charAt(0) !== "/" ){
+		url = "/" + url;
+	}
+	if( url.slice(-1) !== "/" ){
+		url = url + "/";
+	}
+	return url;
+}
+
+// Firefox serves extension files from moz-extension://, so the icon font URL
+// hardcoded in materialdesignicons.min.css (chrome-extension://) can't load.
+if( chrome.runtime.getURL("").indexOf("chrome-extension://") !== 0 ){
+	$('head').append('<style id="shine-icon-font">@font-face{font-family:"Material Design Icons";src:url("' + chrome.runtime.getURL("materialdesignicons-webfont.woff2") + '") format("woff2");font-weight:normal;font-style:normal;}</style>');
+}
 
 // FUNCTIONS SECTION
 
@@ -37,7 +87,9 @@ var defaultSettings = {
 		"shortcuts" : "show", 
 		"sidebar" : "", 
 		"multis" : "",
-		"navigate" : "hide"
+		"navigate" : "hide",
+		"redirect" : "on",
+		"keyboard" : "on"
 	},
 
 	"customization" : {
@@ -61,15 +113,11 @@ var defaultSettings = {
     },
 
     "subreddits" : [
-    	{"url" : "www.reddit.com/r/shine/", "layout" : "list"},
-    	{"url" : "www.reddit.com/r/aww/", "layout" : "grid"},
-    	{"url" : "www.reddit.com/r/earthporn/", "layout" : "list"}
+    	{"url" : "old.reddit.com/r/aww/", "layout" : "grid"},
+    	{"url" : "old.reddit.com/r/earthporn/", "layout" : "grid"}
     ],
 
-    "multireddits" : [
-    	{"url" : "www.reddit.com/user/evilnight/m/redditunes", "layout" : "grid"},
-    	{"url" : "www.reddit.com/user/Abbigale221/m/moviesandtv", "layout" : "list"}
-    ],
+    "multireddits" : [],
 
     "account" : {
     	"status" : "shinebright"
@@ -101,6 +149,19 @@ todayIs = curr_month.toString() + curr_date.toString();
 // this sets up the basic global interface
 function SHINE(){
 	currentSettings.account.status = "shinebright";
+
+	// scripts to run in the page's own JavaScript world once settings are applied
+	var mainWorldScripts = [];
+
+	if( !currentSettings.global.redirect ){
+		currentSettings.global.redirect = "on";
+		chrome.storage.local.set({"shine": currentSettings});
+	}
+
+	if( !currentSettings.global.keyboard ){
+		currentSettings.global.keyboard = "on";
+		chrome.storage.local.set({"shine": currentSettings});
+	}
 	
 
 	//console.log(currentSettings);
@@ -222,9 +283,9 @@ function SHINE(){
 
 		'</div>'+
 
-		'<form action="//www.reddit.com/' + currentSubreddit + 'search" id="shine-search" name="search">'+
+		'<form action="/' + currentSubreddit + 'search" id="shine-search" name="search">'+
         	'<div class="shine-search-wrapper"><input name="q" placeholder="type here and hit enter" tabindex="20" type="text" id="shine-search-box">'+
-        	'<a href="https://www.reddit.com/wiki/search" title="advanced search: by author, subreddit..."></a>'+
+        	'<a href="/wiki/search" title="advanced search: by author, subreddit..."></a>'+
         	'</div>'+
         	'<input tabindex="22" type="submit" value="">';
 
@@ -306,6 +367,24 @@ function SHINE(){
 						'<select name="settings-comment-navigation" id="settings-comment-navigation">'+
 							'<option value="hide">Hide</option>'+
 							'<option value="show">Show</option>'+
+						'</select>'+
+					'</div>'+
+				'</div>'+
+				'<div class="settings-halves">'+
+					'<div class="settings-column-half">'+
+						'<label for="settings-keyboard-shortcuts">Keyboard Shortcuts</label>'+
+						'<span class="settings-small-print">Arrow keys for comments and albums, Shift to open the RES-selected post. Esc always closes.</span>'+
+						'<select name="settings-keyboard-shortcuts" id="settings-keyboard-shortcuts">'+
+							'<option value="on">On</option>'+
+							'<option value="off">Off</option>'+
+						'</select>'+
+					'</div>'+
+					'<div class="settings-column-half">'+
+						'<label for="settings-old-redirect">Redirect to Old Reddit</label>'+
+						'<span class="settings-small-print">Send www.reddit.com links to old.reddit.com, where SHINE works.</span>'+
+						'<select name="settings-old-redirect" id="settings-old-redirect">'+
+							'<option value="on">On</option>'+
+							'<option value="off">Off</option>'+
 						'</select>'+
 					'</div>'+
 				'</div>'+
@@ -571,6 +650,22 @@ function SHINE(){
 		'<div class="changelog-panel">'+
 			'<div class="update">'+
 				'<h2>SHINE for Reddit (unofficial) by vhs (u/voythas)</h2>'+
+				'<h3>Version 2.0.0 (community fork)</h3>'+
+				'<ul class="updates">'+
+					'<li class="new">Manifest V3: loads in current Chrome, Edge and Firefox</li>'+
+					'<li class="new">Reddit video (v.redd.it) plays with sound in list and grid views</li>'+
+					'<li class="new">Reddit galleries open as albums</li>'+
+					'<li class="new">Option to redirect www.reddit.com to old.reddit.com (on by default)</li>'+
+					'<li class="new">Option to turn keyboard shortcuts off</li>'+
+					'<li class="enh">Grid thumbnails for reddit video, Twitch clips and Streamable</li>'+
+					'<li class="enh">YouTube Shorts and live links play inline</li>'+
+					'<li class="fix">Gifs no longer show as a black box</li>'+
+					'<li class="fix">Twitch clips, Streamable and SoundCloud embeds work again</li>'+
+					'<li class="fix">Imgur albums fall back to Imgur\'s embed when its API is rate limited</li>'+
+					'<li class="fix">Subreddit and multireddit view defaults now match on old.reddit.com</li>'+
+					'<li class="fix">Toolbar button opens old.reddit.com; reddit image viewer links are no longer redirected</li>'+
+					'<li class="rem">Gfycat support (it shut down in 2023); reddit\'s own copy is used when available</li>'+
+				'</ul>'+
 				'<h3>Version 1.6.0</h3>'+
 				'<ul class="updates">'+
 					'<li class="new">New design for list view - flat (go to customization options)</li>'+
@@ -820,15 +915,18 @@ function SHINE(){
 				subredditURL = currentSettings.subreddits[i].url;
 
 				if( windowLocation != undefined ){
-					if( windowLocation.indexOf( subredditURL ) != -1 ){
+					if( shineNormalizeRedditURL( windowLocation ) == shineNormalizeRedditURL( subredditURL ) ){
 						whichView = currentSettings.subreddits[i].layout;
 					}
 				}
 
-				displayURL = currentSettings.subreddits[i].url;
-				displayURL = displayURL.replace("www.reddit.com","");
+				displayURL = shineNormalizeRedditURL( currentSettings.subreddits[i].url );
 
-				$('.settings-subreddit-defaults').append('<li data-url="' + currentSettings.subreddits[i].url + '"><a href="http://' + currentSettings.subreddits[i].url + '">' + displayURL + '</a><span data-url="' + currentSettings.subreddits[i].url + '" class="remove-default remove-subreddit-default"></span><span class="default-view">' + currentSettings.subreddits[i].layout + ' view</span></li>');
+				$('.settings-subreddit-defaults').append( $('<li>').attr("data-url", currentSettings.subreddits[i].url).append(
+					$('<a>').attr("href", displayURL).text(displayURL),
+					$('<span class="remove-default remove-subreddit-default"></span>').attr("data-url", currentSettings.subreddits[i].url),
+					$('<span class="default-view"></span>').text(currentSettings.subreddits[i].layout + ' view')
+				) );
 
 			}
 
@@ -843,15 +941,18 @@ function SHINE(){
 				multiredditURL = currentSettings.multireddits[i].url;
 
 				if( windowLocation != undefined ){
-					if( windowLocation.indexOf( multiredditURL ) != -1 ){
+					if( shineNormalizeRedditURL( windowLocation ) == shineNormalizeRedditURL( multiredditURL ) ){
 						whichView = currentSettings.multireddits[i].layout;
 					}
 				}
 
-				displayURL = currentSettings.multireddits[i].url;
-				displayURL = displayURL.replace("www.reddit.com/user","").replace("www.reddit.com/me","");
+				displayURL = shineNormalizeRedditURL( currentSettings.multireddits[i].url );
 
-				$('.settings-multireddit-defaults').append('<li data-url="' + currentSettings.multireddits[i].url + '"><a href="http://' + currentSettings.multireddits[i].url + '">' + displayURL + '</a><span data-url="' + currentSettings.multireddits[i].url + '" class="remove-default remove-multireddit-default"></span><span class="default-view">' + currentSettings.multireddits[i].layout + ' view</span></li>');
+				$('.settings-multireddit-defaults').append( $('<li>').attr("data-url", currentSettings.multireddits[i].url).append(
+					$('<a>').attr("href", displayURL).text(displayURL.replace(/^\/(user|me)/, "")),
+					$('<span class="remove-default remove-multireddit-default"></span>').attr("data-url", currentSettings.multireddits[i].url),
+					$('<span class="default-view"></span>').text(currentSettings.multireddits[i].layout + ' view')
+				) );
 
 			}
 
@@ -870,8 +971,7 @@ function SHINE(){
 
 		if( whichView == "grid" ){
 
-			$.getScript( chrome.extension.getURL("jquery.zoom.min.js") );
-			$.getScript( chrome.extension.getURL("shine-grid.js") );
+			mainWorldScripts.push("jquery.zoom.min.js", "shine-media.js", "shine-grid.js");
 
 			thingWidth = screen.width / ( parseInt(currentSettings.grid.columns) + 1);
 
@@ -905,8 +1005,7 @@ function SHINE(){
 				$('html').addClass("shine-list-classic");
 			}			
 
-			$.getScript( chrome.extension.getURL("jquery.zoom.min.js") );
-			$.getScript( chrome.extension.getURL("shine-list.js") );
+			mainWorldScripts.push("jquery.zoom.min.js", "shine-media.js", "shine-list.js");
 			
 			if(currentSettings.list.split == "7030" || currentSettings.list.split == "6040" || currentSettings.list.split == "5050" || currentSettings.list.split == "4060" || currentSettings.list.split == "3070"){
 				
@@ -981,6 +1080,20 @@ function SHINE(){
 	} else if (currentSettings.version.current == shineVersion && currentSettings.version.updateinfo != "hide" && currentSettings.version.dismissed != "yes"){
 		$('.update-info').show();
 	}
+
+
+	// keyboard shortcuts can be turned off (they clash with vim-style
+	// navigation extensions and video player keys)
+	if( currentSettings.global.keyboard == "off" ){
+		$('html').addClass("shine-no-keys");
+	}
+	$('#settings-keyboard-shortcuts').val( currentSettings.global.keyboard == "off" ? "off" : "on" );
+	$('#settings-old-redirect').val( currentSettings.global.redirect == "off" ? "off" : "on" );
+
+	// load the list/grid view scripts, then the comment navigation and
+	// keyboard shortcuts, in that order
+	mainWorldScripts.push("shine-shortcuts.js");
+	shineInjectMain(mainWorldScripts);
 
 
 } // end SHINE function
@@ -1319,6 +1432,34 @@ $('body').on('change','#settings-comment-navigation', function(){
 });
 
 
+$('body').on('change','#settings-keyboard-shortcuts', function(){
+
+	currentSettings.global.keyboard = $(this).val();
+
+	chrome.storage.local.set({"shine": currentSettings}, function(){
+
+		$('html').toggleClass("shine-no-keys", currentSettings.global.keyboard == "off");
+		saveSettingsMessage();
+
+	});
+
+});
+
+
+// the service worker watches storage and turns the redirect rules on or off
+$('body').on('change','#settings-old-redirect', function(){
+
+	currentSettings.global.redirect = $(this).val();
+
+	chrome.storage.local.set({"shine": currentSettings}, function(){
+
+		saveSettingsMessage();
+
+	});
+
+});
+
+
 $('body').on('change','#settings-update-info', function(){
 
 	currentSettings.version.updateinfo = $(this).val();
@@ -1419,7 +1560,7 @@ $('body').on('click','.grid-switch', function(){
 
 				urlToCheck = currentSettings.subreddits[i].url;
 
-				if( $('.pagename a').attr("href").indexOf( urlToCheck ) != -1 ){
+				if( shineNormalizeRedditURL( $('.pagename a').attr("href") ) == shineNormalizeRedditURL( urlToCheck ) ){
 
 					currentSettings.subreddits[i].layout = "grid";
 					foundIt = true;
@@ -1456,7 +1597,7 @@ $('body').on('click','.grid-switch', function(){
 
 				urlToCheck = currentSettings.multireddits[i].url;
 
-				if( $('.pagename a').attr("href").indexOf( urlToCheck ) != -1 ){
+				if( shineNormalizeRedditURL( $('.pagename a').attr("href") ) == shineNormalizeRedditURL( urlToCheck ) ){
 
 					currentSettings.multireddits[i].layout = "grid";
 					foundIt = true;
@@ -1512,7 +1653,7 @@ $('body').on('click','.list-switch', function(){
 
 				urlToCheck = currentSettings.subreddits[i].url;
 
-				if( $('.pagename a').attr("href").indexOf( urlToCheck ) != -1 ){
+				if( shineNormalizeRedditURL( $('.pagename a').attr("href") ) == shineNormalizeRedditURL( urlToCheck ) ){
 
 					currentSettings.subreddits[i].layout = "list";
 					foundIt = true;
@@ -1549,7 +1690,7 @@ $('body').on('click','.list-switch', function(){
 
 				urlToCheck = currentSettings.multireddits[i].url;
 
-				if( $('.pagename a').attr("href").indexOf( urlToCheck ) != -1 ){
+				if( shineNormalizeRedditURL( $('.pagename a').attr("href") ) == shineNormalizeRedditURL( urlToCheck ) ){
 
 					currentSettings.multireddits[i].layout = "list";
 					foundIt = true;
@@ -1604,7 +1745,7 @@ $('body').on('click','.list-side-switch', function(){
 
 				urlToCheck = currentSettings.subreddits[i].url;
 
-				if( $('.pagename a').attr("href").indexOf( urlToCheck ) != -1 ){
+				if( shineNormalizeRedditURL( $('.pagename a').attr("href") ) == shineNormalizeRedditURL( urlToCheck ) ){
 
 					currentSettings.subreddits[i].layout = "list";
 					foundIt = true;
@@ -1641,7 +1782,7 @@ $('body').on('click','.list-side-switch', function(){
 
 				urlToCheck = currentSettings.multireddits[i].url;
 
-				if( $('.pagename a').attr("href").indexOf( urlToCheck ) != -1 ){
+				if( shineNormalizeRedditURL( $('.pagename a').attr("href") ) == shineNormalizeRedditURL( urlToCheck ) ){
 
 					currentSettings.multireddits[i].layout = "list";
 					foundIt = true;
@@ -1933,4 +2074,3 @@ $("body").on('mouseout','.menuarea',function(){
 });
 
 
-$.getScript( chrome.extension.getURL("shine-shortcuts.js") );
