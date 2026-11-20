@@ -1,0 +1,100 @@
+/* Custom accent color (generated from color-orange.css). base.js sets
+   --shine-accent and --shine-accent-dark on <html> from the color picker. */
+html.SHINE.color-custom.res-nightmode.shine-list body > div.content div#siteTable.linklisting > .thing.active-thing {
+  border-left: 5px solid var(--shine-accent, #FF9800) !important; }
+  html.SHINE.color-custom.res-nightmode.shine-list body > div.content div#siteTable.linklisting > .thing.active-thing:hover {
+    border-left: 5px solid var(--shine-accent, #FF9800) !important; }
+html.SHINE.color-custom.res-nightmode.shine-list body > .content div#siteTable > .thing .entry.RES-keyNav-activeElement a.title {
+  color: var(--shine-accent, #FF9800) !important; }
+html.SHINE.color-custom.res-nightmode.shine-list.shine-list-classic .side-comments .shine-comment:hover::after {
+  border: 1px solid var(--shine-accent, #FF9800);
+  color: var(--shine-accent, #FF9800) !important; }
+html.SHINE.color-custom.res-nightmode .md a {
+  color: var(--shine-accent, #FF9800); }
+html.SHINE.color-custom.res-nightmode .tagline a {
+  color: var(--shine-accent, #FF9800) !important; }
+html.SHINE.color-custom.res-nightmode a {
+  color: var(--shine-accent, #FF9800); }
+html.SHINE.color-custom.res-nightmode .search-result-meta a {
+  color: var(--shine-accent, #FF9800) !important; }
+html.SHINE.color-custom.res-nightmode .res-nightmode #progressIndicator h2 {
+  color: var(--shine-accent, #FF9800); }
+html.SHINE.color-custom.res-nightmode .res-nightmode #progressIndicator .RESLoadingSpinner {
+  color: var(--shine-accent, #FF9800); }
+html.SHINE.color-custom.res-nightmode div#sr-header-area li.selected a {
+  color: var(--shine-accent, #FF9800) !important; }
+html.SHINE.color-custom.res-nightmode #header-bottom-left #header-img-a::after, html.SHINE.color-custom.res-nightmode #header-bottom-left #header-img.default-header::after {
+  background-color: transparent !important; }
+html.SHINE.color-custom.lightmode.shine-list body > div.content div#siteTable.linklisting > .thing.active-thing {
+  border-left: 5px solid var(--shine-accent-dark, #E65100) !important; }
+  html.SHINE.color-custom.lightmode.shine-list body > div.content div#siteTable.linklisting > .thing.active-thing:hover {
+    border-left: 5px solid var(--shine-accent-dark, #E65100) !important; }
+html.SHINE.color-custom.lightmode.shine-list body > .content div#siteTable > .thing .entry.RES-keyNav-activeElement a.title {
+  color: var(--shine-accent-dark, #E65100) !important; }
+html.SHINE.color-custom.lightmode.shine-list.shine-list-classic .side-comments .shine-comment:hover::after {
+  border: 1px solid var(--shine-accent-dark, #E65100);
+  color: var(--shine-accent-dark, #E65100) !important; }
+html.SHINE.color-custom.lightmode .md a {
+  color: var(--shine-accent-dark, #E65100); }
+html.SHINE.color-custom.lightmode .tagline a {
+  color: var(--shine-accent-dark, #E65100) !important; }
+html.SHINE.color-custom.lightmode a {
+  color: var(--shine-accent-dark, #E65100); }
+html.SHINE.color-custom.lightmode .search-result-meta a {
+  color: var(--shine-accent-dark, #E65100) !important; }
+html.SHINE.color-custom.lightmode .res-nightmode #progressIndicator h2 {
+  color: var(--shine-accent-dark, #E65100); }
+html.SHINE.color-custom.lightmode .res-nightmode #progressIndicator .RESLoadingSpinner {
+  color: var(--shine-accent-dark, #E65100); }
+html.SHINE.color-custom.lightmode div#sr-header-area li.selected a {
+  color: var(--shine-accent-dark, #E65100) !important; }
+html.SHINE.color-custom.lightmode #header-bottom-left #header-img-a::after, html.SHINE.color-custom.lightmode #header-bottom-left #header-img.default-header::after {
+  background-color: transparent !important; }
+html.SHINE.color-custom .shine-expand .side-comments button.save {
+  background: var(--shine-accent, #FF9800) !important; }
+html.SHINE.color-custom .shine-expand .side-comments button:hover {
+  background: var(--shine-accent-dark, #E65100) !important; }
+html.SHINE.color-custom div#sr-header-area a#sr-more-link:hover {
+  background: var(--shine-accent, #FF9800) !important; }
+html.SHINE.color-custom div#sr-header-area li.selected a {
+  color: var(--shine-accent-dark, #E65100) !important; }
+html.SHINE.color-custom #themeselect input:checked ~ .foreground {
+  border: 3px solid var(--shine-accent, #FF9800); }
+html.SHINE.color-custom #themeselect input:checked ~ .theme-name {
+  color: var(--shine-accent, #FF9800); }
+html.SHINE.color-custom .shine-nav .shine-navicon {
+  background-color: var(--shine-accent-dark, #E65100);
+  transition: background-color 200ms; }
+html.SHINE.color-custom #header-bottom-right a.message-count {
+  color: white !important;
+  background: var(--shine-accent, #FF9800); }
+html.SHINE.color-custom button.btn, html.SHINE.color-custom button.save {
+  background-color: var(--shine-accent, #FF9800); }
+  html.SHINE.color-custom button.btn:hover, html.SHINE.color-custom button.save:hover {
+    background-color: var(--shine-accent-dark, #E65100) !important; }
+html.SHINE.color-custom .update-info .open-changelog {
+  color: var(--shine-accent, #FF9800); }
+html.SHINE.color-custom.colorful #header-bottom-left #header-img-a::after, html.SHINE.color-custom.colorful #header-bottom-left #header-img.default-header::after {
+  background-color: var(--shine-accent-dark, #E65100) !important;
+  color: #fff; }
+html.SHINE.color-custom.colorful .thumbnail.spoiler::before, html.SHINE.color-custom.colorful .thumbnail.nsfw::before, html.SHINE.color-custom.colorful .thumbnail.default::before, html.SHINE.color-custom.colorful .thumbnail.image::before, html.SHINE.color-custom.colorful .thumbnail.self::before {
+  background-color: var(--shine-accent-dark, #E65100) !important; }
+html.SHINE.color-custom.accent .thumbnail.default::before, html.SHINE.color-custom.accent .thumbnail.image::before, html.SHINE.color-custom.accent .thumbnail.self::before {
+  color: var(--shine-accent, #FF9800) !important; }
+html.SHINE.color-custom.accent .thumbnail.nsfw::before {
+  color: #e24343 !important; }
+html.SHINE.color-custom.accent .thumbnail.spoiler::before {
+  color: #faae42 !important; }
+html.SHINE.color-custom.colorlines .thumbnail.spoiler::before, html.SHINE.color-custom.colorlines .thumbnail.nsfw::before, html.SHINE.color-custom.colorlines .thumbnail.default::before, html.SHINE.color-custom.colorlines .thumbnail.image::before, html.SHINE.color-custom.colorlines .thumbnail.self::before {
+  background-color: transparent !important;
+  border: 2px var(--shine-accent, #FF9800) solid !important;
+  color: var(--shine-accent, #FF9800) !important;
+  line-height: 46px; }
+html.SHINE.color-custom.colorlines.modern-layout .thumbnail.spoiler::before, html.SHINE.color-custom.colorlines.modern-layout .thumbnail.nsfw::before, html.SHINE.color-custom.colorlines.modern-layout .thumbnail.default::before, html.SHINE.color-custom.colorlines.modern-layout .thumbnail.image::before, html.SHINE.color-custom.colorlines.modern-layout .thumbnail.self::before {
+  border: 2px var(--shine-accent-dark, #E65100) solid !important;
+  color: var(--shine-accent-dark, #E65100) !important;
+  line-height: 56px !important; }
+html.SHINE.color-custom .archived-infobar::before {
+  background-color: var(--shine-accent-dark, #E65100); }
+html.SHINE #colorselect label.custom .button span {
+  background-color: var(--shine-accent-dark, #E65100); }

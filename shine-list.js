@@ -2,10 +2,7 @@
 $('html').addClass("shine-ready");
 
 
-// imgur authorization
-function setHeader(xhr) {
-    xhr.setRequestHeader('Authorization', 'Client-ID 4120f4b7ddae1ea');
-}
+
 
 // this gets URL variables
 function getUrlVars(url) {
@@ -227,9 +224,9 @@ function checkSideComments(){
 				albumID = url.substr(url.toLowerCase().indexOf("/a/") + 3);	
 				albumID = shineImgurID( albumID );
 
-				$(theSideCommentLinks[i]).attr("data-album", "https://api.imgur.com/3/album/" + albumID + "/images");
+				$(theSideCommentLinks[i]).attr("data-video", shineImgurAlbumEmbed( albumID ));
 
-				$(theSideCommentLinks[i]).addClass("shine-comment comment-album");
+				$(theSideCommentLinks[i]).addClass("shine-comment comment-youtube");
 
 			// we have a gifv
 			}else if( url.toLowerCase().indexOf(".gifv") != -1 ){ 	
@@ -510,7 +507,9 @@ $('body').on('click','div.content div#siteTable.linklisting > .thing:not(.shine-
 		theExpand = $("#expand-" + $(this).data("fullname"));
 
 		// time to decide what kind of link this is
-		url = $(this).find('a.title').attr("data-shine-url");
+		// data-shine-url is set by shineHREF; read the link directly if this post
+		// arrived some way SHINE didn't see (#19 showed a blank expando)
+		url = $(this).find('a.title').attr("data-shine-url") || shineSafeURL( $(this).find('a.title').attr("href") || "" );
 
 		// REDDIT VIDEO (v.redd.it), REDDIT GALLERIES, AND GIF HOSTS THAT SHUT DOWN
 		// these use the media reddit keeps for the post itself
@@ -527,73 +526,13 @@ $('body').on('click','div.content div#siteTable.linklisting > .thing:not(.shine-
 
 			if( url.toLowerCase().indexOf("/a/") != -1){
 
+				// album: Imgur's embed (the shared API key was always rate limited)
+				albumID = shineImgurID( url.substr(url.toLowerCase().indexOf("/a/") + 3) );
 
-				// we got an album
-				albumID = url.substr(url.toLowerCase().indexOf("/a/") + 3);	
-				albumID = shineImgurID( albumID );
+				shineRenderIframe( $(theExpand).find('.large-area'), shineImgurAlbumEmbed( albumID ) );
 
-				$.ajax({
-			      url: "https://api.imgur.com/3/album/" + albumID + "/images",
-			      type: 'GET',
-			      dataType: 'json',
-			      success: function(data) { 
-
-
-				      	$(theExpand).find('.large-area').html('<div class="large-album"></div><div class="album-thumbnails"></div><div class="album-captions"></div>');
-
-				      	$('.active-album').removeClass("active-album");
-						$(theExpand).find(".large-album").addClass("active-album");
-
-				      	for( i = 0; i < data.data.length; i++ ){
-
-				      		captionTitle = data.data[i].title;
-				      		captionDescription = data.data[i].description;
-
-				      		if( captionTitle != null){
-				      			captionTitle = captionTitle.replace('"',"'");
-				      		}
-
-				      		if( captionDescription != null){
-				      			captionDescription = captionDescription.replace('"',"'");
-      						}
-
-      						$(theExpand).find('.album-thumbnails').append('<img data-title="' + shineEscapeHTML(captionTitle) + '" data-description="' + shineEscapeHTML(captionDescription) + '" data-image="' + data.data[i].link + '" src="//i.imgur.com/' + data.data[i].id + 't.jpg" />');
-
-				      	}
-
-				      	$(theExpand).find('.album-thumbnails').find("img").first().addClass("active-thumb");
-
-				      	$(theExpand).find('.large-album').css("background-image", "url(" + data.data[0].link + ")" );
-
-				      	$(theExpand).find('.large-album').zoom({url: data.data[0].link, on: 'click'});
-
-				      	if( data.data[0].title != null || data.data[0].description != null ){
-
-				      		$(theExpand).find('.album-captions').html('<div class="show-captions"><svg version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" x="0px" y="0px" viewBox="-291 389 20 16" style="enable-background:new -291 389 20 16;" xml:space="preserve"><path d="M-273,389h-16c-1.1,0-2,0.9-2,2v12c0,1.1,0.9,2,2,2h16c1.1,0,2-0.9,2-2v-12C-271,389.9-271.9,389-273,389z M-289,397h4v2h-4V397z M-279,403h-10v-2h10V403z M-273,403h-4v-2h4V403z M-273,399h-10v-2h10V399z"/></svg></div><div class="caption-text"><strong></strong><p></p></div>');
-
-				      		if( data.data[0].title != null ){
-				      			$(theExpand).find('.caption-text strong').text(data.data[0].title);
-				      		}
-
-				      		if( data.data[0].description != null ){
-				      			$(theExpand).find('.caption-text p').text(data.data[0].description);	
-				      		}
-
-				      	}
-
-				      	$(theExpand).attr("data-original-type", "album");
-				      	$(theExpand).attr("data-original-data", "https://api.imgur.com/3/album/" + albumID + "/images");
-
-			      },
-			      error: function(request, status, message) {
-			      	// the shared Imgur API key is often rate limited; fall back to Imgur's own embed
-			      	shineRenderIframe( $(theExpand).find('.large-area'), shineImgurAlbumEmbed( albumID ) );
-			      	$(theExpand).attr("data-original-type", "youtube");
-			      	$(theExpand).attr("data-original-data", shineImgurAlbumEmbed( albumID ));
-			      },
-			      beforeSend: setHeader
-			    });
-
+				$(theExpand).attr("data-original-type", "youtube");
+				$(theExpand).attr("data-original-data", shineImgurAlbumEmbed( albumID ));
 
 			}else if( url.toLowerCase().indexOf("/r/") != -1 ){
 			
@@ -603,112 +542,15 @@ $('body').on('click','div.content div#siteTable.linklisting > .thing:not(.shine-
 				$(theExpand).attr("data-original-data", "comments");
 
 			}else if( url.toLowerCase().indexOf("/gallery/") != -1 ){
-                
-                
-                
-                
-                
-                
-                
-                // this is a gallery
-                galleryID = url.substr(url.toLowerCase().indexOf("/gallery/") + 9);	
-				galleryID = shineImgurID( galleryID );
-                
-                $.ajax({
-			      url: "https://api.imgur.com/3/gallery/album/" + galleryID,
-			      type: 'GET',
-			      dataType: 'json',
-			      success: function(data) { 
-                      
-                      
-                      
-                      albumID = data.data.id;
-                      //ALBUM CODE
-                      
-                      if( data.data.images.length > 1 ){
-                          
-                          $.ajax({
-                              url: "https://api.imgur.com/3/album/" + albumID + "/images",
-                              type: 'GET',
-                              dataType: 'json',
-                              success: function(data) { 
-                                  
 
+				// gallery: Imgur's embed handles both albums and single posts
+				galleryID = shineImgurID( url.substr(url.toLowerCase().indexOf("/gallery/") + 9) );
 
-                                    $(theExpand).find('.large-area').html('<div class="large-album"></div><div class="album-thumbnails"></div><div class="album-captions"></div>');
+				shineRenderIframe( $(theExpand).find('.large-area'), shineImgurAlbumEmbed( galleryID ) );
 
-                                    $('.active-album').removeClass("active-album");
-                                    $(theExpand).find(".large-album").addClass("active-album");
+				$(theExpand).attr("data-original-type", "youtube");
+				$(theExpand).attr("data-original-data", shineImgurAlbumEmbed( galleryID ));
 
-                                    for( i = 0; i < data.data.length; i++ ){
-
-                                        captionTitle = data.data[i].title;
-                                        captionDescription = data.data[i].description;
-
-                                        if( captionTitle != null){
-                                            captionTitle = captionTitle.replace('"',"'");
-                                        }
-
-                                        if( captionDescription != null){
-                                            captionDescription = captionDescription.replace('"',"'");
-                                        }
-
-                                        $(theExpand).find('.album-thumbnails').append('<img data-title="' + shineEscapeHTML(captionTitle) + '" data-description="' + shineEscapeHTML(captionDescription) + '" data-image="' + data.data[i].link + '" src="//i.imgur.com/' + data.data[i].id + 't.jpg" />');
-
-                                    }
-
-                                    $(theExpand).find('.album-thumbnails').find("img").first().addClass("active-thumb");
-
-                                    $(theExpand).find('.large-album').css("background-image", "url(" + data.data[0].link + ")" );
-
-                                    $(theExpand).find('.large-album').zoom({url: data.data[0].link, on: 'click'});
-
-                                    if( data.data[0].title != null || data.data[0].description != null ){
-
-                                        $(theExpand).find('.album-captions').html('<div class="show-captions"><svg version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" x="0px" y="0px" viewBox="-291 389 20 16" style="enable-background:new -291 389 20 16;" xml:space="preserve"><path d="M-273,389h-16c-1.1,0-2,0.9-2,2v12c0,1.1,0.9,2,2,2h16c1.1,0,2-0.9,2-2v-12C-271,389.9-271.9,389-273,389z M-289,397h4v2h-4V397z M-279,403h-10v-2h10V403z M-273,403h-4v-2h4V403z M-273,399h-10v-2h10V399z"/></svg></div><div class="caption-text"><strong></strong><p></p></div>');
-
-                                        if( data.data[0].title != null ){
-                                            $(theExpand).find('.caption-text strong').text(data.data[0].title);
-                                        }
-
-                                        if( data.data[0].description != null ){
-                                            $(theExpand).find('.caption-text p').text(data.data[0].description);	
-                                        }
-
-                                    }
-
-                                    $(theExpand).attr("data-original-type", "album");
-                                    $(theExpand).attr("data-original-data", "https://api.imgur.com/3/album/" + albumID + "/images");
-
-                              },
-                              error: function(request, status, message) { 
-                                console.log(message); 
-                              },
-                              beforeSend: setHeader
-                            });
-                          
-                          
-
-                      }else{
-
-                            getImageFromServer( data.data.images[0].link , data.data.images[0].id , theExpand); 
-
-                      }
-                      
-                      // END ALBUM CODE
-                      
-                      
-                      
-                  },
-			      error: function(request, status, message) { 
-			      	// shared Imgur API key rate limited: use Imgur's own embed
-			      	shineRenderIframe( $(theExpand).find('.large-area'), shineImgurAlbumEmbed( galleryID ) );
-			      },
-			      beforeSend: setHeader
-			    });
-
-				
-	
 			}else if( url.toLowerCase().indexOf(".gifv") != -1 ){
 
 				
@@ -1259,64 +1101,7 @@ $('body').on('click','.toggle-child-comments', function(){
 
 
 
-function getCommentAlbumImages( api, target ){
 
-	$.ajax({
-      url: api,
-      type: 'GET',
-      dataType: 'json',
-      success: function(data) { 
-
-		$(target).find(".large-area").html('<div class="large-album"></div><div class="album-thumbnails"></div><div class="album-captions"></div>');
-
-		$('.active-album').removeClass("active-album");
-		$(target).find(".large-album").addClass("active-album");
-
-      	for( i = 0; i < data.data.length; i++ ){
-
-      		captionTitle = data.data[i].title;
-      		captionDescription = data.data[i].description;
-
-      		if( captionTitle != null){
-      			captionTitle = captionTitle.replace('"',"'");
-      		}
-
-      		if( captionDescription != null){
-      			captionDescription = captionDescription.replace('"',"'");
-			}
-
-			$(target).find('.album-thumbnails').append('<img data-title="' + shineEscapeHTML(captionTitle) + '" data-description="' + shineEscapeHTML(captionDescription) + '" data-image="' + data.data[i].link + '" src="//i.imgur.com/' + data.data[i].id + 't.jpg" />');
-
-      	}
-
-      	$(target).find('.album-thumbnails img').first().addClass("active-thumb");
-
-      	$(target).find('.large-album').css("background-image", "url(" + data.data[0].link + ")" );
-
-      	$(target).find('.large-album').zoom({url: data.data[0].link, on: 'click'});
-
-      	if( data.data[0].title != null || data.data[0].description != null ){
-
-      		$(target).find('.album-captions').html('<div class="show-captions"><svg version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" x="0px" y="0px" viewBox="-291 389 20 16" style="enable-background:new -291 389 20 16;" xml:space="preserve"><path d="M-273,389h-16c-1.1,0-2,0.9-2,2v12c0,1.1,0.9,2,2,2h16c1.1,0,2-0.9,2-2v-12C-271,389.9-271.9,389-273,389z M-289,397h4v2h-4V397z M-279,403h-10v-2h10V403z M-273,403h-4v-2h4V403z M-273,399h-10v-2h10V399z"/></svg></div><div class="caption-text"><strong></strong><p></p></div>');
-
-      		if( data.data[0].title != null ){
-      			$(target).find('.caption-text strong').text(data.data[0].title);
-      		}
-
-      		if( data.data[0].description != null ){
-      			$(target).find('.caption-text p').text(data.data[0].description);	
-      		}
-
-      	}
-
-      },
-      error: function(request, status, message) { 
-      	console.log(message); 
-      },
-      beforeSend: setHeader
-    });
-
-}
 
 
 
@@ -1368,10 +1153,6 @@ function replaceExpand(type,data,button){
 
 
 
-
-  }else if( type === "album"){
-
-    getCommentAlbumImages( data, $(button).parents(".shine-expand") );
 
   }else if( type === "reddit"){
 
@@ -1440,13 +1221,7 @@ $('html').on('click','.comment-html5:not(.closecommentmedia)', function(e){
 
 
 
-$('html').on('click','.comment-album:not(.closecommentmedia)', function(e){
 
-	shineShowCommentMediaArea( this );
-	replaceExpand("album", $(this).data("album"), $(this) );
-	e.preventDefault();
-
-});
 
 
 
@@ -1515,7 +1290,14 @@ $(document).on('keyup keydown', function(e){
 
 function shineHREF(n){
 
-	theShinedThings = $('body > .content #siteTable > .thing').not(".shined-thing");
+	theShinedThings = $('body > .content .thing.link').not(".shined-thing").filter(function(){
+		return shineIsListingThing(this);
+	});
+
+	// continue numbering after the posts already prepared
+	if( n === undefined ){
+		n = $('body > .content .thing.shined-thing').filter(function(){ return shineIsListingThing(this); }).length || undefined;
+	}
 
 	for( i =  0; i < theShinedThings.length; i++){
 
@@ -1541,6 +1323,12 @@ function shineHREF(n){
 
 shineHREF();
 
+// posts added later by any add-on (#19); RES and SHINE's own loader are
+// handled below as well, and shineHREF skips posts it already prepared
+shineWatchNewThings("shined-thing", function(){
+	shineHREF();
+});
+
 
 // when RES loads new things, run our JS on them
 
@@ -1550,7 +1338,9 @@ if( $('body').hasClass('res') ){
 
 		shineHREF();
 
-		setTimeout("jQuery('#siteTable > .sitetable.linklisting .thing').first().unwrap()", 1);
+		setTimeout(function(){
+			jQuery('#siteTable > .sitetable.linklisting .thing').first().unwrap();
+		}, 1);
 
 	}, false);
  
@@ -1580,7 +1370,7 @@ if( $('body').hasClass('res') ){
 
 			     window.location.hash = "shiny=" + lastThing;
 
-			     $('body > .content #siteTable').append( $(data).find('#siteTable .thing') );
+			     $('body > .content #siteTable').append( shineThingsFromPage(data) );
 
 			     loading = false;
 

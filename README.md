@@ -26,12 +26,17 @@ SHINE restyles **old reddit** (old.reddit.com) with modern list and grid views, 
 - Gfycat shut down in 2023. Gfycat links use reddit's own copy of the clip if it has one, and otherwise say so.
 - Twitch clips (including `twitch.tv/<channel>/clip/<slug>` links), Streamable and SoundCloud use their current embed URLs. SoundCloud share links (`on.soundcloud.com`) are resolved through SoundCloud's oEmbed service.
 - YouTube Shorts and `/live/` links play inline.
-- Imgur albums fall back to Imgur's own embed when the shared API key is rate limited. Newer slug-style links (`imgur.com/gallery/some-title-ID`) are reduced to the ID, which is the only form Imgur's API and embed accept.
+- Imgur albums and galleries open in Imgur's own embed. (Upstream's shared Imgur API key was rate limited on every test, so the API and the key are gone.) Newer slug-style links (`imgur.com/gallery/some-title-ID`) are reduced to the ID, which is the only form the embed accepts.
+- Wikipedia previews in grid view work, using Wikipedia's page-summary API (they never appeared before). Vimeo thumbnails use Vimeo's oEmbed endpoint.
 - Comment media links open in the post's media area in the two-column list layout too (#14), and on text posts.
 - Embedded players are allowed to autoplay and go fullscreen.
 
 **Settings and fixes**
 - Keyboard shortcuts can be turned off (#33, #37). Shortcuts also ignore keys typed into text fields, editable areas and video players.
+- Custom accent color: pick any color in Theme Settings (#36).
+- Font choice: Open Sans (default), the system font, Verdana or Georgia (#9).
+- Posts added after the page loads, by SHINE, RES, uAutoPagerize or anything else, get the same treatment as the first page (#19).
+- Open Sans is bundled, so pages no longer request fonts from Google.
 - Per-subreddit and per-multireddit grid/list defaults now match on any reddit hostname. Before, defaults were saved as `www.reddit.com/...` and never matched on old.reddit.com.
 - Search uses the current site instead of always going to www.reddit.com.
 
@@ -39,6 +44,9 @@ SHINE restyles **old reddit** (old.reddit.com) with modern list and grid views, 
 - Post and comment link URLs are percent-encoded before they go into HTML attributes or CSS.
 - Imgur captions are inserted as text, not HTML.
 - Upgrading jQuery removes the old behavior of running cross-domain script responses automatically.
+- No third-party scripts run on reddit pages: the Wikipedia and Vimeo lookups used JSONP (a script from those sites injected into the page) and now use plain JSON requests.
+- Upstream's Imgur API key was also being sent to Vimeo and Wikipedia with every request; it's removed entirely.
+- Pages fetched for infinite scrolling are parsed in a detached document, so their images and scripts never load.
 
 ## Install (unpacked)
 
@@ -72,6 +80,8 @@ See [TODO.md](TODO.md) for what's untested and the upstream issues that are stil
 ## License
 
 Upstream doesn't include a license file. This fork keeps the original authors' credits below and doesn't add a license of its own.
+
+Bundled third-party libraries and fonts keep their own licenses; see [THIRD_PARTY_NOTICES.md](THIRD_PARTY_NOTICES.md).
 
 ## Authors
 

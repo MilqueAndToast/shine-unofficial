@@ -2,7 +2,7 @@
    "manifest_version": 3,
    "name": "SHINE for reddit (unofficial)",
    "short_name": "SHINE",
-   "version": "2.0.1",
+   "version": "2.0.2",
    "description": "Experience old reddit with modern list and grid view interfaces that focus on bringing the content to you.",
    "icons": {
       "16": "icon-16.png",
@@ -59,7 +59,8 @@
          "colors/color-indigo.css",
          "colors/color-pink.css",
          "colors/color-yellow.css",
-         "colors/color-purple.css"
+         "colors/color-purple.css",
+         "colors/color-custom.css"
       ],
       "matches": [ "*://old.reddit.com/*" ],
       "run_at": "document_start"
@@ -77,7 +78,7 @@
       "run_at": "document_end"
    } ],
    "web_accessible_resources": [ {
-      "resources": [ "materialdesignicons-webfont.woff2" ],
+      "resources": [ "materialdesignicons-webfont.woff2", "fonts/opensans/*.woff2", "fonts.css" ],
       "matches": [ "*://*.reddit.com/*" ]
    } ],
    "browser_specific_settings": {

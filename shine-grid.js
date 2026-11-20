@@ -1,9 +1,6 @@
 // all the functions at the top
 
-// imgur authorization
-function setHeader(xhr) {
-    xhr.setRequestHeader('Authorization', 'Client-ID 4120f4b7ddae1ea');
-}
+
 
 
 
@@ -34,29 +31,6 @@ function getUrlVars(url) {
 
 
 // this function gets an imgur album image
-function getAlbumImage(api, target){
-
-	$.ajax({
-      url: api,
-      type: 'GET',
-      dataType: 'json',
-      success: function(data) {
-
-      	$(target).find('.preview-replace, .preview-album').replaceWith("<div data-album='" + api + "' class='preview preview-album' style='background-image:url(" + data.data[0].link + ")'></div>");
-
-      },
-      error: function(request, status, message) {
-      	// the shared Imgur API key is often rate limited: use reddit's thumbnail
-      	// and open Imgur's own album embed instead
-      	var albumID = (api.match(/album\/([^\/]+)/) || [])[1];
-      	if( albumID ){
-      		shineGridEmbedPreview( $(target).first(), "", shineImgurAlbumEmbed( albumID ) );
-      	}
-      },
-      beforeSend: setHeader
-    });
-
-}
 
 
 
@@ -67,65 +41,8 @@ function getAlbumImage(api, target){
 
 
 
-function getEntireAlbum(api){
 
-	$.ajax({
-      url: api,
-      type: 'GET',
-      dataType: 'json',
-      success: function(data) {
 
-        console.log(data);
-
-      	for( i = 0; i < data.data.length; i++ ){
-
-      		captionTitle = data.data[i].title;
-      		captionDescription = data.data[i].description;
-
-      		if( captionTitle != null){
-      			captionTitle = captionTitle.replace('"',"'");
-      		}
-
-      		if( captionDescription != null){
-      			captionDescription = captionDescription.replace('"',"'");
-      		}
-
-      		$('.album-thumbnails').append('<img data-title="' + shineEscapeHTML(captionTitle) + '" data-description="' + shineEscapeHTML(captionDescription) + '" data-image="' + data.data[i].link + '" src="//i.imgur.com/' + data.data[i].id + 't.jpg" />');
-
-      	}
-
-      	$('.album-thumbnails').find("img").first().addClass("active-thumb");
-
-      	$('.large-album').css("background-image", "url(" + data.data[0].link + ")" );
-
-      	$('.shine-expand .large-album').zoom({url: data.data[0].link, on: 'click'});
-
-      	$('.album-captions').html("");
-
-      	if( data.data[0].title != null || data.data[0].description != null ){
-
-      		$('.album-captions').html('<div class="show-captions"><svg version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" x="0px" y="0px" viewBox="-291 389 20 16" style="enable-background:new -291 389 20 16;" xml:space="preserve"><path d="M-273,389h-16c-1.1,0-2,0.9-2,2v12c0,1.1,0.9,2,2,2h16c1.1,0,2-0.9,2-2v-12C-271,389.9-271.9,389-273,389z M-289,397h4v2h-4V397z M-279,403h-10v-2h10V403z M-273,403h-4v-2h4V403z M-273,399h-10v-2h10V399z"/></svg></div><div class="caption-text"><strong></strong><p></p></div>');
-
-      		if( data.data[0].title != null ){
-      			$('.caption-text strong').text(data.data[0].title);
-      		}
-
-      		if( data.data[0].description != null ){
-      			$('.caption-text p').text(data.data[0].description);
-      		}
-
-      	}
-
-		$('html').addClass("expanding expand-albums");
-
-      },
-      error: function(request, status, message) {
-      	console.log(message);
-      },
-      beforeSend: setHeader
-    });
-
-}
 
 
 
@@ -139,22 +56,29 @@ function getEntireAlbum(api){
 // this gets our vimeo thumbnail
 function getVimeoThumbnail(vidID, target){
 
-	$.ajax({
-      url: '//vimeo.com/api/v2/video/' + vidID + '.json',
-      type: 'GET',
-      dataType: 'jsonp',
-      success: function(data) {
-
-        var vimeoThumb = data[0].thumbnail_large;
-
-		    $(target).find('.preview-replace').replaceWith("<div class='preview preview-vimeo' data-video='//player.vimeo.com/video/" + vidID + "?autoplay=1' style='background-image:url(" + vimeoThumb + ")' ></div>");
-
-      },
-      error: function(request, status, message) {
-      	console.log(message);
-      },
-      beforeSend: setHeader
-    });
+	// Vimeo's oEmbed endpoint allows cross-site requests. The old v2 API was
+	// called with JSONP, which ran a script from vimeo.com inside reddit's page.
+	// vidID is everything after "vimeo.com/" (can be channels/name/12345);
+	// oEmbed resolves it and returns the real video ID
+	fetch("https://vimeo.com/api/oembed.json?url=" + encodeURIComponent("https://vimeo.com/" + vidID))
+		.then(function(response){
+			if( !response.ok ){
+				throw new Error("HTTP " + response.status);
+			}
+			return response.json();
+		})
+		.then(function(data){
+			var id = (data && data.video_id) || String(vidID).split("/").pop();
+			var $preview = $("<div class='preview preview-vimeo'></div>").attr("data-video", "https://player.vimeo.com/video/" + encodeURIComponent(id) + "?autoplay=1");
+			if( data && data.thumbnail_url ){
+				$preview.css("background-image", "url(" + shineSafeURL(data.thumbnail_url) + ")");
+			}
+			$(target).find('.preview-replace').replaceWith($preview);
+		})
+		.catch(function(){
+			$(target).find('.preview-replace').remove();
+			$(target).addClass("nopreview");
+		});
 
 }
 
@@ -343,48 +267,37 @@ function getRedditText(url, content, target){
 
 
 
-function getWikiContent(articleTitle, target){
+function getWikiContent(articleURL, target){
 
-	$.ajax({
-      url: '//en.wikipedia.org/w/api.php?action=parse&format=json&page=' + articleTitle,
-      type: 'GET',
-      dataType: 'jsonp',
-      success: function(data) {
+	// Wikipedia's page summary API gives the lead image directly and allows
+	// cross-site requests. The old code loaded the whole article with JSONP
+	// (a script from wikipedia.org inside reddit's page), measured its images
+	// while they were hidden, and never found one.
+	var match = String(articleURL).match(/\/\/([a-z0-9-]+)\.(?:m\.)?wikipedia\.(?:org|com)\/wiki\/([^?#]+)/i);
+	if( !match ){
+		$(target).find('.preview-replace').remove();
+		$(target).addClass("nopreview");
+		return;
+	}
 
-      	$(target).find('.preview-replace').append("<div class='wiki-content' style='display:none;'></div>");
-
-      	$(target).find('.wiki-content').html(data.parse.text["*"]);
-
-      	wikiImage = $(target).find('.wiki-content img');
-
-      	for( i = 0; i < wikiImage.length; i++ ){
-
-      		if( $(wikiImage[i]).width() > 50 ){
-
-      			$(target).find('.preview-replace').replaceWith("<div class='preview preview-wikipedia' style='background-image:url(" + $(wikiImage[i]).attr("src") + ")'></div>");
-
-      			return;
-
-      		}
-
-      		if( i = wikiImage.length - 1 ){
-
-      			$(target).find('.preview-replace').remove();
-      			$(target).addClass("nopreview");
-
-      		}
-
-      	}
-
-      	$(target).find('.preview-replace').remove();
-      	$(target).addClass("nopreview");
-
-      },
-      error: function(request, status, message) {
-      	console.log(message);
-      },
-      beforeSend: setHeader
-    });
+	fetch("https://" + match[1] + ".wikipedia.org/api/rest_v1/page/summary/" + match[2])
+		.then(function(response){
+			if( !response.ok ){
+				throw new Error("HTTP " + response.status);
+			}
+			return response.json();
+		})
+		.then(function(data){
+			var image = data && ((data.originalimage && data.originalimage.source) || (data.thumbnail && data.thumbnail.source));
+			if( !image ){
+				throw new Error("no image");
+			}
+			$(target).find('.preview-replace').replaceWith( $("<div class='preview preview-wikipedia'></div>").css("background-image", "url(" + shineSafeURL(image) + ")") );
+		})
+		.catch(function(){
+			$(target).find('.preview-replace').remove();
+			$(target).addClass("nopreview");
+		});
 
 }
 
@@ -461,34 +374,7 @@ function getYouTubeTimeStamp(timeStamp){
 
 
 
-function getGalleryImage(api, target){
 
-	$.ajax({
-      url: api,
-      type: 'GET',
-      dataType: 'json',
-      success: function(data) {
-
-          if( data.data.images.length > 1 ){
-
-                albumAPI = "https://api.imgur.com/3/album/" + data.data.id + "/images";
-
-                $(target).find('.preview-replace').replaceWith("<div data-album='" + albumAPI + "' class='preview preview-album' style='background-image:url(" + data.data.images[0].link + ")'></div>");
-
-          }else{
-
-                getImageFromServer( data.data.images[0].link , data.data.images[0].id , target);
-
-          }
-
-      },
-      error: function(request, status, message) {
-      	console.log(message);
-      },
-      beforeSend: setHeader
-    });
-
-}
 
 
 
@@ -609,15 +495,12 @@ function createPreviews(theThings){
 
 			if( url.toLowerCase().indexOf("/a/") != -1){
 
-				// we got an album
-				albumID = url.substr(url.toLowerCase().indexOf("/a/") + 3);
-				albumID = shineImgurID( albumID );
-
-				albumAPI = "https://api.imgur.com/3/album/" + albumID + "/images";
+				// album: card with reddit's thumbnail that opens Imgur's embed
+				albumID = shineImgurID( url.substr(url.toLowerCase().indexOf("/a/") + 3) );
 
 				$(theThings[i]).find(whereToPlace).append("<div class='preview preview-replace'></div>");
 
-				getAlbumImage(albumAPI, ".id-" + $(theThings[i]).attr("data-fullname"));
+				shineGridEmbedPreview( theThings[i], "", shineImgurAlbumEmbed( albumID ) );
 
 			}else if( url.toLowerCase().indexOf("/r/") != -1 ){
 
@@ -627,24 +510,11 @@ function createPreviews(theThings){
 
 			}else if( url.toLowerCase().indexOf("/gallery/") != -1 ){
 
-
-
-
-
-                // this is a gallery
-                galleryID = url.substr(url.toLowerCase().indexOf("/gallery/") + 9);
-				galleryID = shineImgurID( galleryID );
-
-				galleryAPI = "https://api.imgur.com/3/gallery/album/" + galleryID;
+				galleryID = shineImgurID( url.substr(url.toLowerCase().indexOf("/gallery/") + 9) );
 
 				$(theThings[i]).find(whereToPlace).append("<div class='preview preview-replace'></div>");
 
-				getGalleryImage(galleryAPI, ".id-" + $(theThings[i]).attr("data-fullname"));
-
-
-
-
-
+				shineGridEmbedPreview( theThings[i], "", shineImgurAlbumEmbed( galleryID ) );
 
 			}else if( url.toLowerCase().indexOf(".gifv") != -1 ){
 
@@ -918,11 +788,10 @@ function createPreviews(theThings){
 
 			url = url.split(/[?#]/)[0]; // REMOVES QUERY STRING AND HASH
 
-			wikiTitle = url.substr(url.search(/wikipedia/i) + 19);
 
 			$(theThings[i]).find(whereToPlace).append("<div class='preview preview-replace'></div>");
 
-			getWikiContent(wikiTitle, ".id-" + $(theThings[i]).attr("data-fullname"));
+			getWikiContent(url, ".id-" + $(theThings[i]).attr("data-fullname"));
 
 		}
 
@@ -981,6 +850,12 @@ function createPreviews(theThings){
 
 createPreviews( $('body > .content #siteTable .thing') );
 
+// posts added later by any add-on (#19); createPreviews marks posts "shined",
+// so posts handled by the RES and SHINE loaders below aren't done twice
+shineWatchNewThings("shined", function(fresh){
+	createPreviews( fresh );
+});
+
 
 
 
@@ -1006,7 +881,9 @@ if( $('body').hasClass('res') ){
 
 		createPreviews( $('body > .content .sitetable.linklisting .thing').not(".shined") );
 
-		setTimeout("jQuery('#siteTable > .sitetable.linklisting .thing').first().unwrap()", 1);
+		setTimeout(function(){
+			jQuery('#siteTable > .sitetable.linklisting .thing').first().unwrap();
+		}, 1);
 
 	}, false);
 
@@ -1033,7 +910,7 @@ if( $('body').hasClass('res') ){
 
 			     window.location.hash = "shiny=" + lastThing;
 
-			     $('body > .content #siteTable').append( $(data).find('#siteTable .thing') );
+			     $('body > .content #siteTable').append( shineThingsFromPage(data) );
 
 			     createPreviews( $('body > .content #siteTable .thing').not(".shined") );
 
@@ -1125,9 +1002,9 @@ function checkSideComments(){
 				albumID = url.substr(url.toLowerCase().indexOf("/a/") + 3);
 				albumID = shineImgurID( albumID );
 
-				$(theSideCommentLinks[i]).attr("data-album", "https://api.imgur.com/3/album/" + albumID + "/images");
+				$(theSideCommentLinks[i]).attr("data-video", shineImgurAlbumEmbed( albumID ));
 
-				$(theSideCommentLinks[i]).addClass("shine-comment comment-album");
+				$(theSideCommentLinks[i]).addClass("shine-comment comment-youtube");
 
 			// we have a gifv
 			}else if( url.toLowerCase().indexOf(".gifv") != -1 ){
@@ -1380,18 +1257,7 @@ $('body').on('click','.preview-vimeo', function(){
 
 });
 
-$('body').on('click','.preview-album',function(){
 
-	resetInterfaces();
-
-	loadSideComments( $('.shine-expand .side-comments'), $(this).parents('.thing').find('a.comments').attr("href") );
-
-	getEntireAlbum( $(this).data("album") );
-
-  $('.shine-expand').attr("data-original-type", "album");
-  $('.shine-expand').attr("data-original-data", $(this).data("album"));
-
-});
 
 $('body').on('click','.album-thumbnails img', function(){
 
@@ -1550,65 +1416,7 @@ function clearExpandStuff(){
 
 
 
-function getCommentAlbumImages( api ){
 
-  $.ajax({
-      url: api,
-      type: 'GET',
-      dataType: 'json',
-      success: function(data) {
-
-        clearExpandStuff();
-
-        for( i = 0; i < data.data.length; i++ ){
-
-          captionTitle = data.data[i].title;
-          captionDescription = data.data[i].description;
-
-          if( captionTitle != null){
-            captionTitle = captionTitle.replace('"',"'");
-          }
-
-          if( captionDescription != null){
-            captionDescription = captionDescription.replace('"',"'");
-          }
-
-          $('.album-thumbnails').append('<img data-title="' + shineEscapeHTML(captionTitle) + '" data-description="' + shineEscapeHTML(captionDescription) + '" data-image="' + data.data[i].link + '" src="//i.imgur.com/' + data.data[i].id + 't.jpg" />');
-
-        }
-
-        $('.album-thumbnails').find("img").first().addClass("active-thumb");
-
-        $('.large-album').css("background-image", "url(" + data.data[0].link + ")" );
-
-        $('.shine-expand .large-album').zoom({url: data.data[0].link, on: 'click'});
-
-        $('.album-captions').html("");
-
-        if( data.data[0].title != null || data.data[0].description != null ){
-
-          $('.album-captions').html('<div class="show-captions"><svg version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" x="0px" y="0px" viewBox="-291 389 20 16" style="enable-background:new -291 389 20 16;" xml:space="preserve"><path d="M-273,389h-16c-1.1,0-2,0.9-2,2v12c0,1.1,0.9,2,2,2h16c1.1,0,2-0.9,2-2v-12C-271,389.9-271.9,389-273,389z M-289,397h4v2h-4V397z M-279,403h-10v-2h10V403z M-273,403h-4v-2h4V403z M-273,399h-10v-2h10V399z"/></svg></div><div class="caption-text"><strong></strong><p></p></div>');
-
-          if( data.data[0].title != null ){
-            $('.caption-text strong').text(data.data[0].title);
-          }
-
-          if( data.data[0].description != null ){
-            $('.caption-text p').text(data.data[0].description);
-          }
-
-        }
-
-    $('html').addClass("expanding expand-albums");
-
-      },
-      error: function(request, status, message) {
-        console.log(message);
-      },
-      beforeSend: setHeader
-    });
-
-}
 
 
 
@@ -1681,16 +1489,6 @@ function replaceExpand(type,data,button){
   }else if( type === "reddit"){
 
     shineGridOpenRedditMedia( data );
-
-  }else if( type === "album"){
-
-
-
-
-    getCommentAlbumImages( data );
-
-
-
 
   }
 
@@ -1777,13 +1575,7 @@ $('html').not('.shinelight').on('click','.comment-html5:not(.closecommentmedia)'
 
 
 
-$('html').not('.shinelight').on('click','.comment-album:not(.closecommentmedia)', function(e){
 
-  replaceExpand("album", $(this).data("album"), $(this) );
-
-	e.preventDefault();
-
-});
 
 
 

@@ -615,6 +615,69 @@ function shineGridOpenRedditMedia(fullname){
 
 
 // ---------------------------------------------------------------------------
+// Posts added after the page loaded (SHINE's or RES's infinite scrolling,
+// uAutoPagerize and similar add-ons) need the same preparation as the first
+// page. Watch the listing and hand new posts to the view's callback.
+
+// Posts from a fetched listing page. Parsing in a detached document means the
+// page's images, iframes and scripts never load; only the posts are adopted.
+function shineThingsFromPage(html){
+	var doc = new DOMParser().parseFromString(html, "text/html");
+	return $(doc).find("#siteTable > .thing").map(function(){
+		return document.adoptNode(this);
+	}).get();
+}
+
+function shineIsListingThing(el){
+	return $(el).is(".thing.link") && !$(el).closest(".shine-expand, .side-comments").length;
+}
+
+function shineWatchNewThings(processedClass, callback){
+	var content = document.querySelector("body > .content");
+	if( !content || !("MutationObserver" in window) ){
+		return;
+	}
+	var pending = false;
+	var flush = function(){
+		pending = false;
+		var siteTable = document.getElementById("siteTable");
+		var fresh = $(content).find(".thing.link").not("." + processedClass).filter(function(){
+			return shineIsListingThing(this);
+		});
+		if( !fresh.length ){
+			return;
+		}
+		// some add-ons insert the next page beside the listing; move those
+		// posts into it so the list/grid layout applies to them
+		if( siteTable ){
+			fresh.each(function(){
+				if( !$.contains(siteTable, this) ){
+					siteTable.appendChild(this);
+				}
+			});
+		}
+		callback(fresh);
+	};
+	new MutationObserver(function(mutations){
+		if( pending ){
+			return;
+		}
+		for( var i = 0; i < mutations.length; i++ ){
+			var added = mutations[i].addedNodes;
+			for( var j = 0; j < added.length; j++ ){
+				var node = added[j];
+				if( node.nodeType === 1 && ($(node).is(".thing.link") || node.querySelector(".thing.link")) ){
+					pending = true;
+					setTimeout(flush, 50);
+					return;
+				}
+			}
+		}
+	}).observe(content, { childList: true, subtree: true });
+}
+
+
+// ---------------------------------------------------------------------------
 // Third-party embed URLs for services that changed since SHINE was written.
 
 function shineTwitchClipEmbed(url){

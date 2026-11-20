@@ -2413,3 +2413,28 @@ html.SHINE .shine-media-message a {
 html.SHINE .large-html5 video {
     background: #000;
 }
+
+/* 2.0 fork: font choice (#9). Pseudo-elements keep their own fonts (icons), and
+   code stays monospace. */
+html.SHINE.shine-font-system body, html.SHINE.shine-font-system body :not(code, pre, kbd, samp, tt, code *, pre *) {
+    font-family: system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif !important;
+}
+
+html.SHINE.shine-font-verdana body, html.SHINE.shine-font-verdana body :not(code, pre, kbd, samp, tt, code *, pre *) {
+    font-family: Verdana, Geneva, Tahoma, sans-serif !important;
+}
+
+html.SHINE.shine-font-serif body, html.SHINE.shine-font-serif body :not(code, pre, kbd, samp, tt, code *, pre *) {
+    font-family: Georgia, "Times New Roman", Times, serif !important;
+}
+
+/* custom color picker in the theme panel */
+html.SHINE .settings-panel input[type="color"] {
+    width: 60px;
+    height: 32px;
+    padding: 0;
+    border: 1px solid #ccc;
+    background: none;
+    cursor: pointer;
+    margin-bottom: 10px;
+}

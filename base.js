@@ -28,6 +28,28 @@ window.addEventListener("message", function(e){
 	});
 });
 
+// Custom accent color (#36): colors/color-custom.css reads these variables.
+// The darker shade is used for buttons and highlights, like the built-in colors.
+function shineApplyCustomColor(hex){
+	if( !/^#[0-9a-f]{6}$/i.test(hex || "") ){
+		hex = "#ff9800";
+	}
+	var dark = "#" + [1, 3, 5].map(function(i){
+		var channel = Math.round(parseInt(hex.substr(i, 2), 16) * 0.75);
+		return ("0" + channel.toString(16)).slice(-2);
+	}).join("");
+	document.documentElement.style.setProperty("--shine-accent", hex);
+	document.documentElement.style.setProperty("--shine-accent-dark", dark);
+}
+
+// Font choice (#9): base.css has one rule per class.
+function shineApplyFont(font){
+	$('html').removeClass("shine-font-system shine-font-verdana shine-font-serif");
+	if( font == "system" || font == "verdana" || font == "serif" ){
+		$('html').addClass("shine-font-" + font);
+	}
+}
+
 // Saved subreddit/multireddit defaults used to store "www.reddit.com/r/foo/".
 // Compare by path only so they work on old.reddit.com and any other host.
 function shineNormalizeRedditURL(url){
@@ -45,10 +67,21 @@ function shineNormalizeRedditURL(url){
 	return url;
 }
 
-// Firefox serves extension files from moz-extension://, so the icon font URL
-// hardcoded in materialdesignicons.min.css (chrome-extension://) can't load.
+// Firefox serves extension files from moz-extension://, so the font URLs
+// written as chrome-extension://__MSG_@@extension_id__/ in
+// materialdesignicons.min.css and fonts.css can't load there. Re-declare them
+// with this browser's extension URL.
 if( chrome.runtime.getURL("").indexOf("chrome-extension://") !== 0 ){
 	$('head').append('<style id="shine-icon-font">@font-face{font-family:"Material Design Icons";src:url("' + chrome.runtime.getURL("materialdesignicons-webfont.woff2") + '") format("woff2");font-weight:normal;font-style:normal;}</style>');
+	fetch(chrome.runtime.getURL("fonts.css"))
+		.then(function(response){ return response.text(); })
+		.then(function(css){
+			var style = document.createElement("style");
+			style.id = "shine-text-font";
+			style.textContent = css.split("chrome-extension://__MSG_@@extension_id__/").join(chrome.runtime.getURL(""));
+			document.head.appendChild(style);
+		})
+		.catch(function(){});
 }
 
 // FUNCTIONS SECTION
@@ -540,7 +573,22 @@ function SHINE(){
 							  '<input type="radio" name="settings-color-theme" value="pink">'+
 							  '<div class="button"><span></span></div>'+
 							'</label>'+
+							'<label class="color custom" title="Custom color">'+
+							  '<input type="radio" name="settings-color-theme" value="custom">'+
+							  '<div class="button"><span></span></div>'+
+							'</label>'+
 						'</div>'+
+						'<label for="settings-custom-color">Custom Color</label>'+
+						'<span class="settings-small-print">Pick any accent color. Choosing one switches to it.</span>'+
+						'<input type="color" name="settings-custom-color" id="settings-custom-color" value="#ff9800">'+
+						'<label for="settings-font">Font</label>'+
+						'<span class="settings-small-print">The typeface for SHINE and reddit text.</span>'+
+						'<select name="settings-font" id="settings-font">'+
+							'<option value="opensans">Open Sans (default)</option>'+
+							'<option value="system">System font</option>'+
+							'<option value="verdana">Verdana (classic reddit)</option>'+
+							'<option value="serif">Georgia (serif)</option>'+
+						'</select>'+
 						'<label for="settings-layout-switch">List View Design</label>'+
 						'<span class="settings-small-print">Select your desired design.</span>'+
 						'<select name="settings-layout-switch" id="settings-layout-switch">'+
@@ -650,6 +698,16 @@ function SHINE(){
 		'<div class="changelog-panel">'+
 			'<div class="update">'+
 				'<h2>SHINE for Reddit (unofficial) by vhs (u/voythas)</h2>'+
+				'<h3>Version 2.0.2 (community fork)</h3>'+
+				'<ul class="updates">'+
+					'<li class="new">Custom accent color: pick any color in Theme Settings</li>'+
+					'<li class="new">Font choice: Open Sans, system font, Verdana or Georgia</li>'+
+					'<li class="fix">Posts added by other add-ons (uAutoPagerize and similar) open properly instead of a blank panel</li>'+
+					'<li class="fix">Wikipedia previews in grid view work (they never showed before)</li>'+
+					'<li class="enh">Imgur albums open Imgur\'s embed right away</li>'+
+					'<li class="enh">Open Sans is bundled, so pages no longer load fonts from Google</li>'+
+					'<li class="enh">No scripts from Wikipedia or Vimeo run on reddit pages anymore</li>'+
+				'</ul>'+
 				'<h3>Version 2.0.1 (community fork)</h3>'+
 				'<ul class="updates">'+
 					'<li class="fix">Redirect now really skips reddit\'s image viewer (/media), settings and similar pages</li>'+
@@ -876,6 +934,12 @@ function SHINE(){
 	}else{
 		$('html, body').addClass("color-"+currentSettings.customization.color);
 	}
+
+	// custom accent color (#36) and font choice (#9)
+	shineApplyCustomColor( currentSettings.customization.customColor || "#ff9800" );
+	$('#settings-custom-color').val( currentSettings.customization.customColor || "#ff9800" );
+	shineApplyFont( currentSettings.customization.font || "opensans" );
+	$('#settings-font').val( currentSettings.customization.font || "opensans" );
 
 
 
@@ -2007,6 +2071,44 @@ $('body').on('change','input[type=radio][name=settings-color-theme]',function(){
 
 		$('html, body').addClass("color-"+currentSettings.customization.color);
 
+		saveSettingsMessage();
+
+	});
+
+});
+
+// live preview while dragging in the color picker; save when it's chosen
+$('body').on('input','#settings-custom-color', function(){
+	shineApplyCustomColor( $(this).val() );
+});
+
+$('body').on('change','#settings-custom-color', function(){
+
+	currentSettings.customization.customColor = $(this).val();
+	currentSettings.customization.color = "custom";
+
+	chrome.storage.local.set({"shine": currentSettings}, function(){
+
+		$('html, body').removeClass(function (index, className) {
+		    return (className.match(/\bcolor-\S+/g) || []).join(' ');
+		});
+		$('html, body').addClass("color-custom");
+		$('input[type="radio"][name="settings-color-theme"][value="custom"]').prop('checked', true);
+		shineApplyCustomColor( currentSettings.customization.customColor );
+
+		saveSettingsMessage();
+
+	});
+
+});
+
+$('body').on('change','#settings-font', function(){
+
+	currentSettings.customization.font = $(this).val();
+
+	chrome.storage.local.set({"shine": currentSettings}, function(){
+
+		shineApplyFont( currentSettings.customization.font );
 		saveSettingsMessage();
 
 	});
