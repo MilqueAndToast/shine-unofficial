@@ -650,6 +650,15 @@ function SHINE(){
 		'<div class="changelog-panel">'+
 			'<div class="update">'+
 				'<h2>SHINE for Reddit (unofficial) by vhs (u/voythas)</h2>'+
+				'<h3>Version 2.0.1 (community fork)</h3>'+
+				'<ul class="updates">'+
+					'<li class="fix">Redirect now really skips reddit\'s image viewer (/media), settings and similar pages</li>'+
+					'<li class="fix">Comment media links work in the two-column list layout, and on text posts</li>'+
+					'<li class="fix">SoundCloud share links (on.soundcloud.com) play; grid SoundCloud cards no longer autoplay</li>'+
+					'<li class="fix">Imgur albums with titles in the link load in the embed</li>'+
+					'<li class="fix">Video starts muted when the browser blocks autoplay with sound</li>'+
+					'<li class="fix">The "settings saved" notice disappears again; no error on pages without a sort menu</li>'+
+				'</ul>'+
 				'<h3>Version 2.0.0 (community fork)</h3>'+
 				'<ul class="updates">'+
 					'<li class="new">Manifest V3: loads in current Chrome, Edge and Firefox</li>'+
@@ -1245,7 +1254,10 @@ $('body').on('click','.shine-multi', function(){
 function saveSettingsMessage(){
 
 	$('html').addClass("settings-are-saved");
-	setTimeout("jQuery('html').removeClass('settings-are-saved')", 2000);		
+	// a function, not a string: extensions may not evaluate strings as code
+	setTimeout(function(){
+		$('html').removeClass("settings-are-saved");
+	}, 2000);
 
 }
 
@@ -2058,10 +2070,13 @@ $(".hohoho-header").detach().prependTo('span.user');
 
 $(document).ready(function(){
 
-	$(".menuarea").css({
-		"position" : "absolute",
-		"left" : $(".menuarea").position().left + "px"
-	});
+	// not every page has a sort menu (.menuarea)
+	if( $(".menuarea").length ){
+		$(".menuarea").css({
+			"position" : "absolute",
+			"left" : $(".menuarea").position().left + "px"
+		});
+	}
 
 });
 

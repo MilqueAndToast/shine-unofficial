@@ -280,20 +280,15 @@ function getImageType(arrayBuffer){
 
 
 
-// this converts a regular old gif into a gfycat image
-function convertGiftoGfy(target, url){
+// previews a gif as an image
+function shineShowGif(target, url){
 
 	// Gfycat's transcoder shut down in 2023, so preview the gif itself
 	$(target).find('.preview-replace').replaceWith( $("<div class='preview preview-image'></div>").attr("data-url", url).css("background-image", "url(" + url + ")") );
 
 }
 
-function getCommentGfyCatURL(url, target){
 
-	// Gfycat shut down in 2023; show the gif as an image
-	$(target).attr("data-image", url).addClass("shine-comment comment-image");
-
-}
 
 
 
@@ -405,9 +400,11 @@ function getWikiContent(articleTitle, target){
 // getting the Sound Cloud embed
 function getSoundCloudContent(soundCloudURL, target){
 
-	// the SoundCloud widget takes the track/playlist URL directly; the old
-	// resolve API needed a client ID that no longer works
-	$(target).find('.preview-replace').replaceWith("<div class='preview preview-soundcloud'><iframe allow='autoplay; fullscreen; encrypted-media; picture-in-picture' scrolling='no' frameborder='no' src='" + shineSoundCloudEmbed( soundCloudURL ) + "'></iframe></div>");
+	// SoundCloud player URL via oEmbed (resolves on.soundcloud.com share links).
+	// No autoplay: the player sits inside the grid card.
+	shineSoundCloudEmbedAsync( soundCloudURL, false, function(embed){
+		$(target).find('.preview-replace').replaceWith("<div class='preview preview-soundcloud'><iframe allow='autoplay; fullscreen; encrypted-media; picture-in-picture' scrolling='no' frameborder='no' src='" + embed + "'></iframe></div>");
+	});
 
 }
 
@@ -614,7 +611,7 @@ function createPreviews(theThings){
 
 				// we got an album
 				albumID = url.substr(url.toLowerCase().indexOf("/a/") + 3);
-				albumID = albumID.split(/[?#]/)[0];
+				albumID = shineImgurID( albumID );
 
 				albumAPI = "https://api.imgur.com/3/album/" + albumID + "/images";
 
@@ -636,7 +633,7 @@ function createPreviews(theThings){
 
                 // this is a gallery
                 galleryID = url.substr(url.toLowerCase().indexOf("/gallery/") + 9);
-				galleryID = galleryID.split(/[?#]/)[0];
+				galleryID = shineImgurID( galleryID );
 
 				galleryAPI = "https://api.imgur.com/3/gallery/album/" + galleryID;
 
@@ -699,7 +696,7 @@ function createPreviews(theThings){
 
 
 
-		// REGULAR OLD GIFS CONVERTED TO GFYCAT
+		// REGULAR OLD GIFS
 		else if( url.toLowerCase().indexOf(".gif") != -1 && url.toLowerCase().indexOf(".gifv") == -1 && url.toLowerCase().indexOf("/r/") == -1 ){
 
 
@@ -707,7 +704,7 @@ function createPreviews(theThings){
 
 			$(theThings[i]).find(whereToPlace).append("<div class='preview preview-replace'></div>");
 
-			convertGiftoGfy( ".id-" + $(theThings[i]).attr("data-fullname"), url );
+			shineShowGif( ".id-" + $(theThings[i]).attr("data-fullname"), url );
 
 
 		}
@@ -953,22 +950,7 @@ function createPreviews(theThings){
 
 
 
-		//GFYCAT
-        else if( url.toLowerCase().indexOf("gfycat.com") != -1 ){
 
-	        url = url.split(/[?#]/)[0]; // REMOVES QUERY STRING AND HASH
-
-	        gfyID = url.substr(url.toLowerCase().indexOf("gfycat.com/") + 11);
-
-	        if( gfyID.indexOf(".webm") != -1 || gfyID.indexOf(".gifv") != -1 ){
-		        gfyID = gfyID.substring(0, gfyID.length - 5);
-	        }else if ( gfyID.indexOf(".ogg") != -1 || gfyID.indexOf(".ogv") != -1 || gfyID.indexOf(".mp4") != -1){
-	        	gfyID = gfyID.substring(0, gfyID.length - 4);
-	        }
-
-			       $(theThings[i]).find(whereToPlace).append("<div style='background-image:url(//thumbs.gfycat.com/" + gfyID + "-poster.jpg)' class='preview preview-gfycat' data-url='" + gfyID + "'></div>");
-
-        }
 
 
 
@@ -1141,7 +1123,7 @@ function checkSideComments(){
 
 				// we got an album
 				albumID = url.substr(url.toLowerCase().indexOf("/a/") + 3);
-				albumID = albumID.split(/[?#]/)[0];
+				albumID = shineImgurID( albumID );
 
 				$(theSideCommentLinks[i]).attr("data-album", "https://api.imgur.com/3/album/" + albumID + "/images");
 
@@ -1270,8 +1252,6 @@ function checkSideComments(){
 
 		}
 
-		// this is a gfycat link
-		
 
 		else{
 
@@ -1383,20 +1363,7 @@ $('body').on('click','.preview-gifv', function(){
 
 });
 
-$('body').on('click','.preview-gfycat', function(){
 
-	resetInterfaces();
-
-	$('.shine-expand .large-html5').html("<video controls preload='auto' autoplay='autoplay' muted='muted' loop='loop' webkit-playsinline ><source src='//fat.gfycat.com/" + $(this).data("url") + ".mp4' type='video/mp4' /><source src='//giant.gfycat.com/" + $(this).data("url") + ".mp4' type='video/mp4' /><source src='//zippy.gfycat.com/" + $(this).data("url") + ".mp4' type='video/mp4' /></video>");
-
-	loadSideComments( $('.shine-expand .side-comments'), $(this).parents('.thing').find('a.comments').attr("href") );
-
-	$('html').addClass("expanding expand-html5s");
-
-  $('.shine-expand').attr("data-original-type", "gfycat");
-  $('.shine-expand').attr("data-original-data", $(this).data("url"));
-
-});
 
 $('body').on('click','.preview-vimeo', function(){
 
@@ -1715,18 +1682,6 @@ function replaceExpand(type,data,button){
 
     shineGridOpenRedditMedia( data );
 
-  }else if( type === "gfycat"){
-
-
-
-
-    $('.shine-expand .large-html5').html("<video controls preload='auto' autoplay='autoplay' muted='muted' loop='loop' webkit-playsinline ><source src='//fat.gfycat.com/" + data + ".mp4' type='video/mp4' /><source src='//giant.gfycat.com/" + data + ".mp4' type='video/mp4' /><source src='//zippy.gfycat.com/" + data + ".mp4' type='video/mp4' /></video>");
-
-    $('html').addClass("expand-html5s");
-
-
-
-
   }else if( type === "album"){
 
 
@@ -1815,13 +1770,7 @@ $('html').not('.shinelight').on('click','.comment-html5:not(.closecommentmedia)'
 
 
 
-$('html').not('.shinelight').on('click','.comment-gfycat:not(.closecommentmedia)', function(e){
 
-  replaceExpand("gfycat", $(this).data("video"), $(this) );
-
-	e.preventDefault();
-
-});
 
 
 

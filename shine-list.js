@@ -24,8 +24,8 @@ function getUrlVars(url) {
 
 
 
-// this converts a regular old gif into a gfycat image
-function convertGiftoGfy(target, url){
+// shows a gif as an image
+function shineShowGif(target, url){
 
 	// Gfycat's transcoder shut down in 2023, so show the gif itself
 	shineRenderImage( $(target).find('.large-area'), url );
@@ -37,7 +37,6 @@ function convertGiftoGfy(target, url){
 
 
 
-// this gets the GfyCatURL for our comment
 
 
 // this gets the image type
@@ -226,7 +225,7 @@ function checkSideComments(){
 
 				// we got an album
 				albumID = url.substr(url.toLowerCase().indexOf("/a/") + 3);	
-				albumID = albumID.split(/[?#]/)[0];
+				albumID = shineImgurID( albumID );
 
 				$(theSideCommentLinks[i]).attr("data-album", "https://api.imgur.com/3/album/" + albumID + "/images");
 
@@ -354,26 +353,6 @@ function checkSideComments(){
 
 		}
 
-	/*
-		// this is a gfycat link
-		else if( url.toLowerCase().indexOf("gfycat.com") != -1 ){
-
-			url = url.split(/[?#]/)[0]; // REMOVES QUERY STRING AND HASH
-	        
-	        gfyID = url.substr(url.indexOf("gfycat.com/") + 11);
-	        
-	        if( gfyID.indexOf(".webm") != -1 || gfyID.indexOf(".gifv") != -1 ){
-		        gfyID = gfyID.substring(0, gfyID.length - 5);
-	        }else if ( gfyID.indexOf(".ogg") != -1 || gfyID.indexOf(".ogv") != -1 || gfyID.indexOf(".mp4") != -1){
-	        	gfyID = gfyID.substring(0, gfyID.length - 4);
-	        }
-
-	        $(theSideCommentLinks[i]).attr("data-video", gfyID );
-
-			$(theSideCommentLinks[i]).addClass("shine-comment comment-gfycat");
-
-        }
- 		*/      
 		else{
 
 			$(theSideCommentLinks[i]).addClass("shine-comment");
@@ -551,7 +530,7 @@ $('body').on('click','div.content div#siteTable.linklisting > .thing:not(.shine-
 
 				// we got an album
 				albumID = url.substr(url.toLowerCase().indexOf("/a/") + 3);	
-				albumID = albumID.split(/[?#]/)[0];
+				albumID = shineImgurID( albumID );
 
 				$.ajax({
 			      url: "https://api.imgur.com/3/album/" + albumID + "/images",
@@ -633,7 +612,7 @@ $('body').on('click','div.content div#siteTable.linklisting > .thing:not(.shine-
                 
                 // this is a gallery
                 galleryID = url.substr(url.toLowerCase().indexOf("/gallery/") + 9);	
-				galleryID = galleryID.split(/[?#]/)[0];
+				galleryID = shineImgurID( galleryID );
                 
                 $.ajax({
 			      url: "https://api.imgur.com/3/gallery/album/" + galleryID,
@@ -753,7 +732,7 @@ $('body').on('click','div.content div#siteTable.linklisting > .thing:not(.shine-
 				    {
 				    	console.log('URL:'+url);
 				    	console.log('HTML5:'+html5);
-						convertGiftoGfy(theExpand, url);
+						shineShowGif(theExpand, url);
 				    },
 				    success: function ()
 				    {
@@ -792,12 +771,12 @@ $('body').on('click','div.content div#siteTable.linklisting > .thing:not(.shine-
 
 		
 
-		// REGULAR OLD GIFS CONVERTED TO GFYCAT
+		// REGULAR OLD GIFS
 		else if( url.toLowerCase().indexOf(".gif") != -1 && url.toLowerCase().indexOf(".gifv") == -1 && url.toLowerCase().indexOf("/r/") == -1 ){
 
 			url = url.split(/[?#]/)[0]; // REMOVES QUERY STRING AND HASH
 
-			convertGiftoGfy( theExpand, url );
+			shineShowGif( theExpand, url );
 			
 		}
 
@@ -992,14 +971,17 @@ $('body').on('click','div.content div#siteTable.linklisting > .thing:not(.shine-
         else if( url.toLowerCase().indexOf("soundcloud.com") != -1 ){
 
 
-	        // the SoundCloud widget takes the track/playlist URL directly; the old
-	        // resolve API needed a client ID that no longer works
-	        soundCloudEmbed = shineSoundCloudEmbed( url );
+	        // SoundCloud player URL via oEmbed (the old resolve API needed a client
+	        // ID that no longer works, and the widget rejects on.soundcloud.com links)
+	        $(theExpand).find('.large-area').html('<div class="shine-media-message">Loading…</div>');
 
-	        $(theExpand).find('.large-area').html("<div class='large-soundcloud'><iframe allow='autoplay; fullscreen; encrypted-media; picture-in-picture' scrolling='no' frameborder='no' src='" + soundCloudEmbed + "'></iframe></div>");
-
-	        $(theExpand).attr("data-original-type", "youtube");
-			$(theExpand).attr("data-original-data", soundCloudEmbed);
+	        (function(expand){
+		        shineSoundCloudEmbedAsync( url, true, function(soundCloudEmbed){
+			        $(expand).find('.large-area').html("<div class='large-soundcloud'><iframe allow='autoplay; fullscreen; encrypted-media; picture-in-picture' scrolling='no' frameborder='no' src='" + soundCloudEmbed + "'></iframe></div>");
+			        $(expand).attr("data-original-type", "youtube");
+			        $(expand).attr("data-original-data", soundCloudEmbed);
+		        });
+	        })(theExpand);
 
             
         }
@@ -1387,16 +1369,6 @@ function replaceExpand(type,data,button){
 
 
 
-  }else if( type === "gfycat"){
-
-
-
-
-    $(button).parents(".shine-expand").find(".large-area").html("<div class='large-html5'><video controls preload='auto' autoplay='autoplay' muted='muted' loop='loop' webkit-playsinline ><source src='//fat.gfycat.com/" + data + ".mp4' type='video/mp4' /><source src='//giant.gfycat.com/" + data + ".mp4' type='video/mp4' /><source src='//zippy.gfycat.com/" + data + ".mp4' type='video/mp4' /></video></div>");
-
-
-
-
   }else if( type === "album"){
 
     getCommentAlbumImages( data, $(button).parents(".shine-expand") );
@@ -1418,36 +1390,61 @@ function replaceExpand(type,data,button){
 }
 
 
-$('html').not('.shinelight, .shine-list-classic').on('click','.comment-image:not(.closecommentmedia)',function(e){
+// Comment media opens in the post's media area. Posts that only show comments
+// (text and link posts) hide that area, so show it and keep the clicked link
+// in view. This used to be a separate handler that never ran, because the
+// handlers below mark the link before that handler's selector was checked.
+function shineShowCommentMediaArea(link){
 
-	replaceExpand("image", $(this).data("image"), $(this));
+	var expand = $(link).parents(".shine-expand");
 
+	if( expand.hasClass("just-comments") ){
+
+		expand.removeClass("just-comments");
+
+		var container = expand.find('.side-comments');
+
+		container.scrollTop(
+		    $(link).offset().top - container.offset().top + container.scrollTop() - 100
+		);
+
+	}
+
+}
+
+$('html').on('click','.comment-image:not(.closecommentmedia)', function(e){
+
+	shineShowCommentMediaArea( this );
+	replaceExpand("image", $(this).data("image"), $(this) );
+	e.preventDefault();
 
 });
 
-$('html').not('.shinelight, .shine-list-classic').on('click','.comment-youtube:not(.closecommentmedia)',function(e){
+$('html').on('click','.comment-youtube:not(.closecommentmedia)', function(e){
 
+	shineShowCommentMediaArea( this );
 	replaceExpand("youtube", $(this).data("video"), $(this) );
+	e.preventDefault();
 
 });
 
-$('html').not('.shinelight, .shine-list-classic').on('click','.comment-html5:not(.closecommentmedia)', function(e){
+$('html').on('click','.comment-html5:not(.closecommentmedia)', function(e){
 
+	shineShowCommentMediaArea( this );
 	replaceExpand("html5", $(this).data("video"), $(this) );
-
-});
-
-$('html').not('.shinelight, .shine-list-classic').on('click','.comment-gfycat:not(.closecommentmedia)', function(e){
-
-	replaceExpand("gfycat", $(this).data("video"), $(this) );
+	e.preventDefault();
 
 });
 
 
 
-$('html').not('.shinelight, .shine-list-classic').on('click','.comment-album:not(.closecommentmedia)', function(e){
 
+
+$('html').on('click','.comment-album:not(.closecommentmedia)', function(e){
+
+	shineShowCommentMediaArea( this );
 	replaceExpand("album", $(this).data("album"), $(this) );
+	e.preventDefault();
 
 });
 
@@ -1487,24 +1484,7 @@ $('body').on('click','.inline-child-toggle', function(){
 
 
 
-$('html').not('.shinelight, .shine-list-classic').on('click','.comment-image:not(.closecommentmedia), .comment-youtube:not(.closecommentmedia), .comment-html5:not(.closecommentmedia), .comment-gfycat:not(.closecommentmedia), .comment-album:not(.closecommentmedia)', function(e){
 
-	if( $(this).parents(".shine-expand").hasClass("just-comments") ){
-
-		$(this).parents(".shine-expand").removeClass("just-comments");
-
-		container = $(this).parents(".shine-expand").find('.side-comments');
-	    scrollTo = $(this);
-
-		container.scrollTop(
-		    scrollTo.offset().top - container.offset().top + container.scrollTop() - 100
-		);
-
-	}
-
-	e.preventDefault();
-
-});
 
 
 

@@ -24,9 +24,10 @@ SHINE restyles **old reddit** (old.reddit.com) with modern list and grid views, 
 **Fixed media**
 - Gifs no longer show as a black box: Imgur gifs play as mp4 and other gifs show as images (#38).
 - Gfycat shut down in 2023. Gfycat links use reddit's own copy of the clip if it has one, and otherwise say so.
-- Twitch clips (including `twitch.tv/<channel>/clip/<slug>` links), Streamable and SoundCloud use their current embed URLs.
+- Twitch clips (including `twitch.tv/<channel>/clip/<slug>` links), Streamable and SoundCloud use their current embed URLs. SoundCloud share links (`on.soundcloud.com`) are resolved through SoundCloud's oEmbed service.
 - YouTube Shorts and `/live/` links play inline.
-- Imgur albums fall back to Imgur's own embed when the shared API key is rate limited.
+- Imgur albums fall back to Imgur's own embed when the shared API key is rate limited. Newer slug-style links (`imgur.com/gallery/some-title-ID`) are reduced to the ID, which is the only form Imgur's API and embed accept.
+- Comment media links open in the post's media area in the two-column list layout too (#14), and on text posts.
 - Embedded players are allowed to autoplay and go fullscreen.
 
 **Settings and fixes**
@@ -56,6 +57,9 @@ There's no store listing. Load it as an unpacked extension.
 Unpacked extensions don't update themselves. Pull the latest changes and click **Reload** on the extensions page.
 
 ## Notes
+
+- Edge and Chrome show "'background.scripts' requires manifest version of 2 or lower" on the extensions page. That's expected: the key is there for Firefox, and Chrome/Edge ignore it.
+- After changing the redirect rules (`rules/`), use the **Reload** button on the extensions page. Turning the extension off and on again doesn't reload them.
 
 - SHINE only works on the old design. With the redirect turned off, www.reddit.com usually serves the redesign, and SHINE stays out of the way there.
 - Some reddit features need you to be signed in, and reddit may send signed-out visitors to old.reddit.com to a login page.

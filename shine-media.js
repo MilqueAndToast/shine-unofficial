@@ -139,6 +139,10 @@ function shineGetMedia(fullname, callback){
 	var thing = document.querySelector('.thing[data-fullname="' + fullname + '"]');
 	var media = thing ? shineMediaFromThing(thing) : null;
 	if( media ){
+		// use the sharper poster if the grid card already fetched the post
+		if( media.lowResPoster && shinePostCache[fullname] ){
+			media.poster = shinePickPreview(shinePostCache[fullname], 640) || media.poster;
+		}
 		callback(media, null);
 		return;
 	}
@@ -316,6 +320,22 @@ function shineVideoElement(media){
 	}else if( media.mp4 ){
 		video.src = media.mp4;
 	}
+
+	// Browsers can refuse to autoplay with sound. Start muted rather than
+	// leaving the player paused; the reader can unmute.
+	video.addEventListener("canplay", function onCanPlay(){
+		video.removeEventListener("canplay", onCanPlay);
+		if( !video.paused ){
+			return;
+		}
+		var attempt = video.play();
+		if( attempt && attempt.catch ){
+			attempt.catch(function(){
+				video.muted = true;
+				video.play().catch(function(){});
+			});
+		}
+	});
 
 	return video;
 }
@@ -611,12 +631,46 @@ function shineStreamableEmbed(url){
 	return m ? "https://streamable.com/e/" + m[1] + "?autoplay=1" : "";
 }
 
-function shineSoundCloudEmbed(url){
-	return "https://w.soundcloud.com/player/?url=" + encodeURIComponent(url.split("#")[0]) + "&auto_play=true&visual=true";
+function shineSoundCloudEmbed(url, autoplay){
+	return "https://w.soundcloud.com/player/?url=" + encodeURIComponent(url.split("#")[0]) + "&auto_play=" + (autoplay ? "true" : "false") + "&visual=true";
+}
+
+// The widget rejects on.soundcloud.com share links, so ask SoundCloud's
+// oEmbed service (which resolves them) for the player URL first.
+function shineSoundCloudEmbedAsync(url, autoplay, callback){
+	var fallback = shineSoundCloudEmbed(url, autoplay);
+	fetch("https://soundcloud.com/oembed?format=json&url=" + encodeURIComponent(url.split("#")[0]))
+		.then(function(response){
+			if( !response.ok ){
+				throw new Error("HTTP " + response.status);
+			}
+			return response.json();
+		})
+		.then(function(data){
+			var src = ((data && data.html) || "").match(/src="([^"]+)"/);
+			if( src && src[1].indexOf("https://w.soundcloud.com/player/") === 0 ){
+				var player = src[1].replace(/&amp;/g, "&").replace(/&auto_play=(true|false)/, "");
+				callback(player + (player.indexOf("?") === -1 ? "?" : "&") + "auto_play=" + (autoplay ? "true" : "false"));
+			}else{
+				callback(fallback);
+			}
+		})
+		.catch(function(){
+			callback(fallback);
+		});
+}
+
+// Imgur's newer links put a title slug before the ID
+// ("imgur.com/gallery/dogs-are-actors-WsjvXFc"). The API and the embed only
+// accept the bare ID (the slug form refuses to be framed), and IDs never
+// contain hyphens, so keep the last hyphen-separated part.
+function shineImgurID(raw){
+	var id = String(raw || "").split(/[?#]/)[0].split("/")[0];
+	return id.split("-").pop();
 }
 
 function shineImgurAlbumEmbed(albumID){
-	return "https://imgur.com/a/" + encodeURIComponent(albumID) + "/embed?pub=true&context=false";
+	return "https://imgur.com/a/" + encodeURIComponent(shineImgurID(albumID)) + "/embed?pub=true&context=false";
 }
 
 // youtube.com/shorts/ID, /live/ID, /embed/ID, m.youtube.com, youtube-nocookie
