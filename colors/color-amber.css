@@ -1,3 +1,6 @@
+html.SHINE.color-amber {
+  --shine-color: #FFC107;
+  --shine-color-dark: #FFB300; }
 html.SHINE.color-amber.res-nightmode.shine-list body > div.content div#siteTable.linklisting > .thing.active-thing {
   border-left: 5px solid #FFC107 !important; }
   html.SHINE.color-amber.res-nightmode.shine-list body > div.content div#siteTable.linklisting > .thing.active-thing:hover {

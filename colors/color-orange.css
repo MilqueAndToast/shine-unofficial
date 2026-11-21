@@ -1,3 +1,6 @@
+html.SHINE.color-orange {
+  --shine-color: #FF9800;
+  --shine-color-dark: #E65100; }
 html.SHINE.color-orange.res-nightmode.shine-list body > div.content div#siteTable.linklisting > .thing.active-thing {
   border-left: 5px solid #FF9800 !important; }
   html.SHINE.color-orange.res-nightmode.shine-list body > div.content div#siteTable.linklisting > .thing.active-thing:hover {

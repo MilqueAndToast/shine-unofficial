@@ -2,7 +2,7 @@
    "manifest_version": 3,
    "name": "SHINE for reddit (unofficial)",
    "short_name": "SHINE",
-   "version": "2.0.2",
+   "version": "2.0.3",
    "description": "Experience old reddit with modern list and grid view interfaces that focus on bringing the content to you.",
    "icons": {
       "16": "icon-16.png",
@@ -18,8 +18,7 @@
       "default_title": "Open old reddit"
    },
    "background": {
-      "service_worker": "background.js",
-      "scripts": [ "background.js" ]
+      "service_worker": "background.js"
    },
    "permissions": [ "storage", "scripting", "declarativeNetRequestWithHostAccess" ],
    "host_permissions": [ "*://*.reddit.com/*" ],
@@ -80,11 +79,5 @@
    "web_accessible_resources": [ {
       "resources": [ "materialdesignicons-webfont.woff2", "fonts/opensans/*.woff2", "fonts.css" ],
       "matches": [ "*://*.reddit.com/*" ]
-   } ],
-   "browser_specific_settings": {
-      "gecko": {
-         "id": "shine-unofficial@fork.local",
-         "strict_min_version": "128.0"
-      }
-   }
+   } ]
 }

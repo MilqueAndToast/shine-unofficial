@@ -698,6 +698,12 @@ function SHINE(){
 		'<div class="changelog-panel">'+
 			'<div class="update">'+
 				'<h2>SHINE for Reddit (unofficial) by vhs (u/voythas)</h2>'+
+				'<h3>Version 2.0.3 (community fork)</h3>'+
+				'<ul class="updates">'+
+					'<li class="fix">Vimeo links from channels, groups and showcases, and unlisted videos, play in list view</li>'+
+					'<li class="fix">Settings links, theme picker, subreddit bar, album thumbnails and grid flair follow your accent color instead of staying orange</li>'+
+					'<li class="enh">Media players and previews are built safely, so odd characters in a link can\'t add markup to the page</li>'+
+				'</ul>'+
 				'<h3>Version 2.0.2 (community fork)</h3>'+
 				'<ul class="updates">'+
 					'<li class="new">Custom accent color: pick any color in Theme Settings</li>'+

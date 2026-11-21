@@ -394,15 +394,40 @@ function shineRenderVideo($area, media){
 	$area.find(".large-html5").append(shineVideoElement(media));
 }
 
-function shineRenderIframe($area, src){
-	var $frame = $("<iframe>").attr({ src: src, frameborder: "0", allow: SHINE_IFRAME_ALLOW, allowfullscreen: "" });
-	$area.html('<div class="large-youtube"></div>');
-	$area.find(".large-youtube").append($frame);
+// Element builders. Values go in through jQuery's attr() and css(), never
+// pasted into an HTML string, so a quote or bracket in a link can't add
+// markup or attributes.
+function shineIframe(src, extra){
+	return $("<iframe>").attr($.extend({ src: src, frameborder: "0", allow: SHINE_IFRAME_ALLOW, allowfullscreen: "" }, extra || {}));
+}
+
+function shineCSSURL(url){
+	return 'url("' + shineSafeURL(url) + '")';
+}
+
+function shineBackgroundDiv(className, url){
+	return $("<div>").addClass(className).css("background-image", shineCSSURL(url));
+}
+
+// Silent looping video (Imgur gifv and similar)
+function shineLoopVideo(src){
+	var $video = $('<video controls preload="auto" autoplay muted loop playsinline></video>');
+	$video.append( $("<source>").attr({ src: src, type: "video/mp4" }) );
+	return $video;
+}
+
+function shineRenderIframe($area, src, wrapperClass, extra){
+	var $wrap = $("<div>").addClass(wrapperClass || "large-youtube").append( shineIframe(src, extra) );
+	$area.empty().append($wrap);
+}
+
+function shineRenderLoopVideo($area, src){
+	$area.empty().append( $('<div class="large-html5"></div>').append( shineLoopVideo(src) ) );
 }
 
 function shineRenderMessage($area, message, link){
 	var $msg = $('<div class="shine-media-message"></div>').text(message);
-	if( link ){
+	if( link && /^https?:\/\//i.test(link) ){
 		$msg.append(" ", $('<a target="_blank" rel="noopener noreferrer"></a>').attr("href", link).text("Open link"));
 	}
 	$area.html("").append($msg);
@@ -736,10 +761,75 @@ function shineImgurAlbumEmbed(albumID){
 	return "https://imgur.com/a/" + encodeURIComponent(shineImgurID(albumID)) + "/embed?pub=true&context=false";
 }
 
+// Vimeo player URL from a vimeo.com link. Handles vimeo.com/ID,
+// vimeo.com/ID/HASH (unlisted), channels/NAME/ID, groups/NAME/videos/ID,
+// showcase/N/video/ID and player.vimeo.com/video/ID?h=HASH.
+// Returns "" when the link isn't a single video (a showcase, a profile).
+function shineVimeoEmbed(url){
+	var m = String(url || "").match(/^(?:https?:)?\/\/(?:[\w-]+\.)?vimeo\.com\/([^?#]*)(\?[^#]*)?/i);
+	if( !m ){
+		return "";
+	}
+	var parts = m[1].split("/").filter(Boolean);
+	var notVideo = /^(showcase|album|event|user|ondemand|channels|groups)$/i;
+	var id = "", hash = "";
+	for( var i = parts.length - 1; i >= 0; i-- ){
+		if( /^\d+$/.test(parts[i]) && !(i > 0 && notVideo.test(parts[i - 1])) ){
+			id = parts[i];
+			if( parts[i + 1] && /^[0-9a-f]{6,}$/i.test(parts[i + 1]) ){
+				hash = parts[i + 1];
+			}
+			break;
+		}
+	}
+	if( !id ){
+		return "";
+	}
+	var h = (m[2] || "").match(/[?&]h=([0-9a-f]+)/i);
+	if( h ){
+		hash = h[1];
+	}
+	return "https://player.vimeo.com/video/" + id + "?autoplay=1" + (hash ? "&h=" + hash : "");
+}
+
+// Same, but asks Vimeo's oEmbed service when the link can't be read directly
+// (custom URLs like vimeo.com/channels/staffpicks/name). Calls back with "" if
+// neither works.
+function shineVimeoEmbedAsync(url, callback){
+	var direct = shineVimeoEmbed(url);
+	if( direct ){
+		callback(direct);
+		return;
+	}
+	fetch("https://vimeo.com/api/oembed.json?url=" + encodeURIComponent(String(url).split("#")[0]))
+		.then(function(response){
+			if( !response.ok ){
+				throw new Error("HTTP " + response.status);
+			}
+			return response.json();
+		})
+		.then(function(data){
+			var src = ((data && data.html) || "").match(/src="([^"]+)"/);
+			var player = src ? shineVimeoEmbed(src[1].replace(/&amp;/g, "&")) : "";
+			if( !player && data && /^\d+$/.test(String(data.video_id)) ){
+				player = "https://player.vimeo.com/video/" + data.video_id + "?autoplay=1";
+			}
+			callback(player);
+		})
+		.catch(function(){
+			callback("");
+		});
+}
+
 // youtube.com/shorts/ID, /live/ID, /embed/ID, m.youtube.com, youtube-nocookie
 function shineYouTubeID(url){
 	var m = url.match(/youtube(?:-nocookie)?\.com\/(?:shorts|live|embed|v)\/([\w-]{6,})/i) ||
 		url.match(/[?&]v=([\w-]{6,})/i) ||
 		url.match(/youtu\.be\/([\w-]{6,})/i);
 	return m ? m[1] : "";
+}
+
+// start is seconds (getYouTubeTimeStamp's result); anything else becomes 0
+function shineYouTubeEmbed(vidID, start){
+	return "https://www.youtube.com/embed/" + encodeURIComponent(vidID || "") + "?rel=0&autoplay=1&start=" + (parseInt(start, 10) || 0);
 }

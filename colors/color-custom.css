@@ -1,5 +1,8 @@
 /* Custom accent color (generated from color-orange.css). base.js sets
    --shine-accent and --shine-accent-dark on <html> from the color picker. */
+html.SHINE.color-custom {
+  --shine-color: var(--shine-accent, #FF9800);
+  --shine-color-dark: var(--shine-accent-dark, #E65100); }
 html.SHINE.color-custom.res-nightmode.shine-list body > div.content div#siteTable.linklisting > .thing.active-thing {
   border-left: 5px solid var(--shine-accent, #FF9800) !important; }
   html.SHINE.color-custom.res-nightmode.shine-list body > div.content div#siteTable.linklisting > .thing.active-thing:hover {

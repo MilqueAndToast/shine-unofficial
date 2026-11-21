@@ -79,7 +79,7 @@ html.SHINE #sr-header-area a {
 
 html.SHINE #sr-header-area a.RESShortcutsCurrentSub,
 html.SHINE #sr-header-area li.selected a{
-	color: rgba(255,103,31,1) !important;
+	color: var(--shine-color, rgb(255,103,31)) !important;
 }
 
 html.SHINE #RESShortcutsSort,
@@ -101,7 +101,7 @@ html.SHINE a#sr-more-link {
 }
 
 html.SHINE a#sr-more-link:hover{
-	background: rgba(255,103,31,1);
+	background: var(--shine-color, rgb(255,103,31));
 	color:#fff;
 	text-decoration: none !important;
 }
@@ -422,7 +422,7 @@ html.SHINE #header-bottom-right a.message-count {
     color: #fff;
     font-weight: 800;
     font-size: 12px;
-    background:rgba(255,103,0,1);
+    background:var(--shine-color, rgb(255,103,0));
 }
 
 html.SHINE #header-bottom-right #RESAccountSwitcherIcon {
@@ -717,7 +717,7 @@ html.SHINE .shine-nav .shine-navicon{
     width:56px;
     height:56px;
     display:block;
-    background: rgba(255,103,0,1);
+    background: var(--shine-color-dark, rgb(255,103,0));
     animation: NAVICON 500ms 1s backwards cubic-bezier(.17,.67,.15,1.61);
     display:block !important;
     border:0px !important;
@@ -1536,7 +1536,7 @@ html.SHINE.shinebright .shine-settings-prompt{
     line-height:20px;
     padding:5px 0;
     display:inline-block;
-    color:rgb(255,103,0);
+    color:var(--shine-color, rgb(255,103,0));
 }
 
 .settings-panel li .default-view{
@@ -2153,11 +2153,11 @@ html.SHINE #themeselect label.legacy-white .foreground span {
 }
 
 #themeselect label.legacy-white input:checked ~ .foreground {
-    border: 3px solid rgb(255, 103, 0);
+    border: 3px solid var(--shine-color, rgb(255,103,0));
 }
 
 #themeselect label.legacy-white input:checked ~ .theme-name {
-    color: rgb(255, 103, 0);
+    color: var(--shine-color, rgb(255,103,0));
 }
 
 html.SHINE #themeselect label.legacy-night .foreground {

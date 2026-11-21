@@ -72,9 +72,7 @@ function getImageFromServer(path, id, target){
 				
 			}else{
 
-				$(target).find('.large-area').html('<div class="large-image" style="background-image:url(//i.imgur.com/' + id + '.png);"></div>');
-
-				$(target).find('.large-image').zoom({url: '//i.imgur.com/' + id + '.png' , on: 'click'});
+				shineRenderImage( $(target).find('.large-area'), '//i.imgur.com/' + id + '.png' );
 
 				$(target).attr("data-original-type", "image");
 				$(target).attr("data-original-data", '//i.imgur.com/' + id + '.png');
@@ -329,7 +327,7 @@ function checkSideComments(){
             timeStamp = getUrlVars(url)["t"];
             timeStamp = getYouTubeTimeStamp(timeStamp);
 
-			$(theSideCommentLinks[i]).attr("data-video", "//www.youtube.com/embed/" + vidID + "?rel=0&autoplay=1&vq=hd1080&wmode=transparent&start=" + timeStamp);
+			$(theSideCommentLinks[i]).attr("data-video", shineYouTubeEmbed(vidID, timeStamp));
 
 			$(theSideCommentLinks[i]).addClass("shine-comment comment-youtube");
 
@@ -339,12 +337,12 @@ function checkSideComments(){
 		// this is youtube share
 		else if( url.toLowerCase().indexOf("youtu.be") != -1 ){
 
-			vidID = url.substr(url.toLowerCase().indexOf("youtu.be/") + 9);
+			vidID = shineYouTubeID(url);
             
             timeStamp = getUrlVars(url)["t"];
             timeStamp = getYouTubeTimeStamp(timeStamp);
 
-            $(theSideCommentLinks[i]).attr("data-video", "//www.youtube.com/embed/" + vidID + "?rel=0&autoplay=1&vq=hd1080&wmode=transparent&start=" + timeStamp);
+            $(theSideCommentLinks[i]).attr("data-video", shineYouTubeEmbed(vidID, timeStamp));
 
 			$(theSideCommentLinks[i]).addClass("shine-comment comment-youtube");
 
@@ -557,7 +555,7 @@ $('body').on('click','div.content div#siteTable.linklisting > .thing:not(.shine-
 				html5 = url.substr(url.toLowerCase().indexOf("imgur.com/") + 10);
 				html5 = html5.substring(0, html5.length - 5);
 
-				$(theExpand).find('.large-area').html('<div class="large-html5"><video  controls preload="auto" autoplay="autoplay" muted="muted" loop="loop" webkit-playsinline ><source src="//i.imgur.com/' + html5  + '.mp4" /></video></div>');
+				shineRenderLoopVideo( $(theExpand).find('.large-area'), '//i.imgur.com/' + html5 + '.mp4' );
 
 				$(theExpand).attr("data-original-type", "html5");
 				$(theExpand).attr("data-original-data", '//i.imgur.com/' + html5  + '.mp4');
@@ -572,17 +570,13 @@ $('body').on('click','div.content div#siteTable.linklisting > .thing:not(.shine-
 				    type: 'HEAD',
 				    error: function()
 				    {
-				    	console.log('URL:'+url);
-				    	console.log('HTML5:'+html5);
 						shineShowGif(theExpand, url);
 				    },
 				    success: function ()
 				    {
-						$(theExpand).find('.large-area').html('<div class="large-html5"><video controls preload="auto" autoplay="autoplay" muted="muted" loop="loop" webkit-playsinline ><source src="//i.imgur.com/' + html5 + '.mp4" /></video></div>');
+						shineRenderLoopVideo( $(theExpand).find('.large-area'), '//i.imgur.com/' + html5 + '.mp4' );
 				    }
 				});
-
-				//$(theExpand).find('.large-area').html('<div class="large-html5"><video controls preload="auto" autoplay="autoplay" muted="muted" loop="loop" webkit-playsinline ><source src="//i.imgur.com/' + html5  + '.mp4" /></video></div>');
 
 				$(theExpand).attr("data-original-type", "html5");
 				$(theExpand).attr("data-original-data", '//i.imgur.com/' + html5  + '.mp4');
@@ -627,10 +621,8 @@ $('body').on('click','div.content div#siteTable.linklisting > .thing:not(.shine-
         
         // REDDIT UPLOADS
 		else if( url.toLowerCase().indexOf("reddituploads.com") != -1){
-			
-			$(theExpand).find('.large-area').html('<div class="large-image" style="background-image:url(' + url + ');"></div>');
 
-			$(theExpand).find('.large-image').zoom({url: url, on: 'click'});
+			shineRenderImage( $(theExpand).find('.large-area'), url );
 
 			$(theExpand).attr("data-original-type", "image");
 			$(theExpand).attr("data-original-data", url);
@@ -646,11 +638,7 @@ $('body').on('click','div.content div#siteTable.linklisting > .thing:not(.shine-
 
 			// this is any other image
 
-			// url = url.split(/[?#]/)[0]; // REMOVES QUERY STRING AND HASH
-			
-			$(theExpand).find('.large-area').html('<div class="large-image" style="background-image:url(' + url + ');"></div>');
-
-			$(theExpand).find('.large-image').zoom({url: url, on: 'click'});
+			shineRenderImage( $(theExpand).find('.large-area'), url );
 
 			$(theExpand).attr("data-original-type", "image");
 			$(theExpand).attr("data-original-data", url);
@@ -670,9 +658,7 @@ $('body').on('click','div.content div#siteTable.linklisting > .thing:not(.shine-
 				liveMemeURL = liveMemeURL.substring(0, liveMemeURL.length - 1);
 			}
 
-			$(theExpand).html('<div class="large-image" style="background-image:url(' + liveMemeURL + ');"></div>');
-
-			$(theExpand).find('.large-album').zoom({url: liveMemeURL, on: 'click'});
+			shineRenderImage( $(theExpand).find('.large-area'), liveMemeURL );
 
 			$(theExpand).attr("data-original-type", "image");
 			$(theExpand).attr("data-original-data", liveMemeURL);
@@ -703,10 +689,12 @@ $('body').on('click','div.content div#siteTable.linklisting > .thing:not(.shine-
             timeStamp = getUrlVars(url)["t"];
             timeStamp = getYouTubeTimeStamp(timeStamp);
 
-            $(theExpand).find(".large-area").html('<div class="large-youtube"><iframe allow="autoplay; fullscreen; encrypted-media; picture-in-picture" frameborder="0" allowfullscreen src="//www.youtube.com/embed/' + vidID + '?rel=0&autoplay=1&vq=hd1080&wmode=transparent&start=' + timeStamp + '" /></div>');
+            embedURL = shineYouTubeEmbed(vidID, timeStamp);
+
+            shineRenderIframe( $(theExpand).find(".large-area"), embedURL );
 
             $(theExpand).attr("data-original-type", "youtube");
-			$(theExpand).attr("data-original-data", '//www.youtube.com/embed/' + vidID + '?rel=0&autoplay=1&vq=hd1080&wmode=transparent&start=' + timeStamp);
+			$(theExpand).attr("data-original-data", embedURL);
 
 		}
 
@@ -739,22 +727,24 @@ $('body').on('click','div.content div#siteTable.linklisting > .thing:not(.shine-
 
 		//PORNHUB.COM INTEGRATION
 		else if( url.toLowerCase().indexOf("pornhub.com") != -1 ){
-      		vidID = url.substr(url.toLowerCase().indexOf("?viewkey=") + 9);
+      		vidID = url.substr(url.toLowerCase().indexOf("?viewkey=") + 9).split(/[&#]/)[0];
+      		embedURL = '//www.pornhub.com/embed/' + encodeURIComponent(vidID);
 
-      		$(theExpand).find(".large-area").html('<div class="large-youtube"><iframe allow="autoplay; fullscreen; encrypted-media; picture-in-picture" src="//www.pornhub.com/embed/' + vidID + '" frameborder="0" width="560" height="315" scrolling="no" allowfullscreen autoplay /></div>');
+      		shineRenderIframe( $(theExpand).find(".large-area"), embedURL, "", { scrolling: "no" } );
 
       		$(theExpand).attr("data-original-type", "pornhub");
-			$(theExpand).attr("data-original-data", '//www.pornhub.com/embed/' + vidID);
+			$(theExpand).attr("data-original-data", embedURL);
 		}
 
 		//XHAMSTER.COM INTEGRATION
 		else if( url.toLowerCase().indexOf("xhamster.com") != -1 ){
-      		vidID = url.substr(url.toLowerCase().lastIndexOf("-") + 1);
+      		vidID = url.substr(url.toLowerCase().lastIndexOf("-") + 1).split(/[?#\/]/)[0];
+      		embedURL = '//xhamster.com/xembed.php?video=' + encodeURIComponent(vidID);
 
-      		$(theExpand).find(".large-area").html('<div class="large-youtube"><iframe allow="autoplay; fullscreen; encrypted-media; picture-in-picture" src="//xhamster.com/xembed.php?video=' + vidID + '" frameborder="0" width="560" height="315" scrolling="no" allowfullscreen autoplay /></div>');
+      		shineRenderIframe( $(theExpand).find(".large-area"), embedURL, "", { scrolling: "no" } );
 
       		$(theExpand).attr("data-original-type", "xhamster");
-			$(theExpand).attr("data-original-data", '//xhamster.com/xembed.php?video=' + vidID);
+			$(theExpand).attr("data-original-data", embedURL);
 		}
 
 		//XVIDEOS.COM INTEGRATION
@@ -762,10 +752,12 @@ $('body').on('click','div.content div#siteTable.linklisting > .thing:not(.shine-
       		vidID = url.substr(url.toLowerCase().indexOf("/video") + 6);
       		vidID = vidID.substr('-'+vidID.length,vidID.indexOf("/") + 1);
 
-      		$(theExpand).find(".large-area").html('<div class="large-youtube"><iframe allow="autoplay; fullscreen; encrypted-media; picture-in-picture" src="//flashservice.xvideos.com/embedframe/' + vidID + '" frameborder="0" scrolling="no" allowfullscreen="allowfullscreen" /></div>');
+      		embedURL = '//flashservice.xvideos.com/embedframe/' + encodeURIComponent(vidID);
+
+      		shineRenderIframe( $(theExpand).find(".large-area"), embedURL, "", { scrolling: "no" } );
 
       		$(theExpand).attr("data-original-type", "xvideos");
-			$(theExpand).attr("data-original-data", '//flashservice.xvideos.com/embedframe/' + vidID);
+			$(theExpand).attr("data-original-data", embedURL);
 		}
 
 
@@ -773,15 +765,17 @@ $('body').on('click','div.content div#siteTable.linklisting > .thing:not(.shine-
 		//YOUTUBE SHARE
 		else if( url.toLowerCase().indexOf("youtu.be") != -1 ){
 
-			vidID = url.substr(url.toLowerCase().indexOf("youtu.be/") + 9);
-            
+			vidID = shineYouTubeID(url);
+
             timeStamp = getUrlVars(url)["t"];
             timeStamp = getYouTubeTimeStamp(timeStamp);
 
-			$(theExpand).find(".large-area").html('<div class="large-youtube"><iframe allow="autoplay; fullscreen; encrypted-media; picture-in-picture" frameborder="0" allowfullscreen src="//www.youtube.com/embed/' + vidID + '?rel=0&autoplay=1&vq=hd1080&wmode=transparent&start=' + timeStamp + '" /></div>');
+            embedURL = shineYouTubeEmbed(vidID, timeStamp);
+
+			shineRenderIframe( $(theExpand).find(".large-area"), embedURL );
 
 			$(theExpand).attr("data-original-type", "youtube");
-			$(theExpand).attr("data-original-data", '//www.youtube.com/embed/' + vidID + '?rel=0&autoplay=1&vq=hd1080&wmode=transparent&start=' + timeStamp);
+			$(theExpand).attr("data-original-data", embedURL);
 			
 
 		}
@@ -794,14 +788,21 @@ $('body').on('click','div.content div#siteTable.linklisting > .thing:not(.shine-
 		// VIMEO
 		else if( url.toLowerCase().indexOf("vimeo.com") != -1 && url.toLowerCase().indexOf("/r/vimeo") == -1 ){
 
-			url = url.split(/[?#]/)[0]; // REMOVES QUERY STRING AND HASH
+			// channels/NAME/ID, unlisted ID/HASH and custom URLs used to be
+			// passed to the player as-is and didn't play
+			$(theExpand).find('.large-area').html('<div class="shine-media-message">Loading…</div>');
 
-			vidID = url.substr(url.toLowerCase().indexOf("vimeo.com/") + 10);
-
-			$(theExpand).find(".large-area").html('<div class="large-youtube"><iframe allow="autoplay; fullscreen; encrypted-media; picture-in-picture" frameborder="0" allowfullscreen src="//player.vimeo.com/video/' + vidID + '?autoplay=1" /></div>');
-
-			$(theExpand).attr("data-original-type", "youtube");
-			$(theExpand).attr("data-original-data", '//player.vimeo.com/video/' + vidID + '?autoplay=1');
+			(function(expand, link){
+				shineVimeoEmbedAsync( link, function(vimeoEmbed){
+					if( !vimeoEmbed ){
+						shineRenderMessage( $(expand).find('.large-area'), "This Vimeo link isn't a single video.", link );
+						return;
+					}
+					shineRenderIframe( $(expand).find('.large-area'), vimeoEmbed );
+					$(expand).attr("data-original-type", "youtube");
+					$(expand).attr("data-original-data", vimeoEmbed);
+				});
+			})(theExpand, url);
 
 		}
 
@@ -819,7 +820,7 @@ $('body').on('click','div.content div#siteTable.linklisting > .thing:not(.shine-
 
 	        (function(expand){
 		        shineSoundCloudEmbedAsync( url, true, function(soundCloudEmbed){
-			        $(expand).find('.large-area').html("<div class='large-soundcloud'><iframe allow='autoplay; fullscreen; encrypted-media; picture-in-picture' scrolling='no' frameborder='no' src='" + soundCloudEmbed + "'></iframe></div>");
+			        shineRenderIframe( $(expand).find('.large-area'), soundCloudEmbed, "large-soundcloud", { scrolling: "no" } );
 			        $(expand).attr("data-original-type", "youtube");
 			        $(expand).attr("data-original-data", soundCloudEmbed);
 		        });
@@ -962,7 +963,7 @@ $('body').on('click','div#siteTable .thing form.hide-button a', function(e){
 
 $('body').on('click','.album-thumbnails img', function(){
 
-	$(this).parents('.shine-expand').find('.large-album').css("background-image", "url(" + $(this).data("image") + ")" );
+	$(this).parents('.shine-expand').find('.large-album').css("background-image", shineCSSURL( $(this).attr("data-image") ) );
 
 	$(this).parents('.shine-expand').find('.large-album').trigger('zoom.destroy');
 
@@ -1127,9 +1128,7 @@ function replaceExpand(type,data,button){
 
 
 
-    $(button).parents(".shine-expand").find(".large-area").html('<div class="large-image" style="background-image:url(' + data + ');"></div>');
-
-	$(button).parents(".shine-expand").find(".large-image").zoom({url: data, on: 'click'});
+    shineRenderImage( $(button).parents(".shine-expand").find(".large-area"), data );
 
 
 
@@ -1139,7 +1138,7 @@ function replaceExpand(type,data,button){
 
 
 
-    $(button).parents(".shine-expand").find(".large-area").html('<div class="large-youtube"><iframe allow="autoplay; fullscreen; encrypted-media; picture-in-picture" frameborder="0" allowfullscreen src="' + data + '" /></div>');
+    shineRenderIframe( $(button).parents(".shine-expand").find(".large-area"), data );
 
 
 
@@ -1149,7 +1148,7 @@ function replaceExpand(type,data,button){
 
 
 
-    $(button).parents(".shine-expand").find(".large-area").html('<div class="large-html5"><video controls preload="auto" autoplay="autoplay" muted="muted" loop="loop" webkit-playsinline ><source src="' + data + '" type="video/mp4" /></video></div>');
+    shineRenderLoopVideo( $(button).parents(".shine-expand").find(".large-area"), data );
 
 
 

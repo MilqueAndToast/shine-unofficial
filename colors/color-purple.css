@@ -1,3 +1,6 @@
+html.SHINE.color-purple {
+  --shine-color: #C70AE7;
+  --shine-color-dark: #9C27B0; }
 html.SHINE.color-purple.res-nightmode.shine-list body > div.content div#siteTable.linklisting > .thing.active-thing {
   border-left: 5px solid #C70AE7 !important; }
   html.SHINE.color-purple.res-nightmode.shine-list body > div.content div#siteTable.linklisting > .thing.active-thing:hover {

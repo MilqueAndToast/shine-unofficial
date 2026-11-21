@@ -1,3 +1,6 @@
+html.SHINE.color-blue {
+  --shine-color: #00B0FF;
+  --shine-color-dark: #0091EA; }
 html.SHINE.color-blue.res-nightmode.shine-list body > div.content div#siteTable.linklisting > .thing.active-thing {
   border-left: 5px solid #00B0FF !important; }
   html.SHINE.color-blue.res-nightmode.shine-list body > div.content div#siteTable.linklisting > .thing.active-thing:hover {

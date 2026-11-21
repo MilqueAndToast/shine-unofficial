@@ -122,7 +122,7 @@ html.SHINE.shine-grid body > .content #siteTable .thing span.linkflairlabel{
 
 html.SHINE.shine-grid body.front-page > .content #siteTable .thing span.linkflairlabel{
     display: block;
-    color: rgba(255,103,0,1);
+    color: var(--shine-color, rgb(255,103,0));
     background: transparent;
     border: 0px;
     font-size: 10px;
@@ -548,7 +548,7 @@ html.SHINE.shine-grid .shine-expand .album-thumbnails img{
 }
 
 html.SHINE.shine-grid .shine-expand .album-thumbnails img.active-thumb{
-    border:2px solid rgba(255,103,31,1);
+    border:2px solid var(--shine-color, rgb(255,103,31));
 }
 
 html.SHINE .album-captions{

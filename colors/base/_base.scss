@@ -1,5 +1,7 @@
 html.SHINE {
 	&.color-#{$colorname} {
+		--shine-color: #{$color_main_accent};
+		--shine-color-dark: #{$color_fab_color};
 		&.res-nightmode {
 			&.shine-list {
 				body {

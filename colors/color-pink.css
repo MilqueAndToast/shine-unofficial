@@ -1,3 +1,6 @@
+html.SHINE.color-pink {
+  --shine-color: #FF4081;
+  --shine-color-dark: #C51162; }
 html.SHINE.color-pink.res-nightmode.shine-list body > div.content div#siteTable.linklisting > .thing.active-thing {
   border-left: 5px solid #FF4081 !important; }
   html.SHINE.color-pink.res-nightmode.shine-list body > div.content div#siteTable.linklisting > .thing.active-thing:hover {

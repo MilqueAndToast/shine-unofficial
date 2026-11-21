@@ -1,3 +1,6 @@
+html.SHINE.color-yellow {
+  --shine-color: #FFEB3B;
+  --shine-color-dark: #FDD835; }
 html.SHINE.color-yellow.res-nightmode.shine-list body > div.content div#siteTable.linklisting > .thing.active-thing {
   border-left: 5px solid #FFEB3B !important; }
   html.SHINE.color-yellow.res-nightmode.shine-list body > div.content div#siteTable.linklisting > .thing.active-thing:hover {

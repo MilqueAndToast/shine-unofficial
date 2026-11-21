@@ -7,7 +7,7 @@ SHINE restyles **old reddit** (old.reddit.com) with modern list and grid views, 
 ## What changed in 2.0
 
 **Runs in current browsers**
-- Manifest V3 with a service worker. Loads in current Chrome and Edge. Firefox 128+ should work but hasn't been tested yet (see [TODO.md](TODO.md)).
+- Manifest V3 with a service worker. Loads in current Chrome and Edge. Firefox 128+ gets its own manifest from a small build script; it should work but hasn't been tested yet (see [TODO.md](TODO.md)).
 - Starts from upstream's `develop` branch, which has the merge conflicts resolved (upstream issues #13, #29, #34, #40).
 - The list and grid scripts run in the page through `chrome.scripting` instead of `$.getScript`, in a fixed order (upstream loaded them in parallel, which was a race).
 - jQuery for the content script updated from 2.1.4 to 3.7.1.
@@ -28,12 +28,13 @@ SHINE restyles **old reddit** (old.reddit.com) with modern list and grid views, 
 - YouTube Shorts and `/live/` links play inline.
 - Imgur albums and galleries open in Imgur's own embed. (Upstream's shared Imgur API key was rate limited on every test, so the API and the key are gone.) Newer slug-style links (`imgur.com/gallery/some-title-ID`) are reduced to the ID, which is the only form the embed accepts.
 - Wikipedia previews in grid view work, using Wikipedia's page-summary API (they never appeared before). Vimeo thumbnails use Vimeo's oEmbed endpoint.
+- Vimeo links from channels, groups and showcases, and unlisted videos (`vimeo.com/<id>/<hash>`), play in list view. Before, everything after `vimeo.com/` was treated as the video ID.
 - Comment media links open in the post's media area in the two-column list layout too (#14), and on text posts.
 - Embedded players are allowed to autoplay and go fullscreen.
 
 **Settings and fixes**
 - Keyboard shortcuts can be turned off (#33, #37). Shortcuts also ignore keys typed into text fields, editable areas and video players.
-- Custom accent color: pick any color in Theme Settings (#36).
+- Custom accent color: pick any color in Theme Settings (#36). Spots that used to stay orange (settings links, the theme picker, the subreddit bar, album thumbnails, grid flair) follow the accent color too.
 - Font choice: Open Sans (default), the system font, Verdana or Georgia (#9).
 - Posts added after the page loads, by SHINE, RES, uAutoPagerize or anything else, get the same treatment as the first page (#19).
 - Open Sans is bundled, so pages no longer request fonts from Google.
@@ -42,11 +43,12 @@ SHINE restyles **old reddit** (old.reddit.com) with modern list and grid views, 
 
 **Security**
 - Post and comment link URLs are percent-encoded before they go into HTML attributes or CSS.
+- Media players, images and grid cards are built as elements with their values set through jQuery's `attr()` and `css()`, not pasted into HTML strings, so a quote or bracket in a link can't add markup.
 - Imgur captions are inserted as text, not HTML.
 - Upgrading jQuery removes the old behavior of running cross-domain script responses automatically.
 - No third-party scripts run on reddit pages: the Wikipedia and Vimeo lookups used JSONP (a script from those sites injected into the page) and now use plain JSON requests.
 - Upstream's Imgur API key was also being sent to Vimeo and Wikipedia with every request; it's removed entirely.
-- Pages fetched for infinite scrolling are parsed in a detached document, so their images and scripts never load.
+- Pages fetched for infinite scrolling and grid text previews are parsed in a detached document, so their images and scripts never load.
 
 ## Install (unpacked)
 
@@ -59,14 +61,16 @@ There's no store listing. Load it as an unpacked extension.
 4. Open https://old.reddit.com/.
 
 **Firefox (128 or newer, untested)**
-1. Go to `about:debugging#/runtime/this-firefox` and click **Load Temporary Add-on…**, then pick `manifest.json`.
-2. Firefox treats host permissions as optional in Manifest V3. Open the extension's details and allow access to reddit.com.
+1. Build the Firefox version (needs [Node.js](https://nodejs.org/) 18 or newer, no packages): `node tools/build-firefox.mjs`. It writes `dist/firefox/`.
+2. Go to `about:debugging#/runtime/this-firefox` and click **Load Temporary Add-on…**, then pick `dist/firefox/manifest.json`.
+3. Firefox treats host permissions as optional in Manifest V3. Open the extension's details and allow access to reddit.com.
+
+The build copies the extension and swaps the service worker for a background script, which is what Firefox runs. Run it again after pulling changes.
 
 Unpacked extensions don't update themselves. Pull the latest changes and click **Reload** on the extensions page.
 
 ## Notes
 
-- Edge and Chrome show "'background.scripts' requires manifest version of 2 or lower" on the extensions page. That's expected: the key is there for Firefox, and Chrome/Edge ignore it.
 - After changing the redirect rules (`rules/`), use the **Reload** button on the extensions page. Turning the extension off and on again doesn't reload them.
 
 - SHINE only works on the old design. With the redirect turned off, www.reddit.com usually serves the redesign, and SHINE stays out of the way there.

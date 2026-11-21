@@ -1,3 +1,6 @@
+html.SHINE.color-teal {
+  --shine-color: #1DE9B6;
+  --shine-color-dark: #00BFA5; }
 html.SHINE.color-teal.res-nightmode.shine-list body > div.content div#siteTable.linklisting > .thing.active-thing {
   border-left: 5px solid #1DE9B6 !important; }
   html.SHINE.color-teal.res-nightmode.shine-list body > div.content div#siteTable.linklisting > .thing.active-thing:hover {

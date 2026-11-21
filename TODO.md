@@ -1,6 +1,6 @@
 # TODO
 
-Status as of 2.0.2 (November 2026).
+Status as of 2.0.3 (November 2026).
 
 ## Tested (Edge 157, signed in, old.reddit.com)
 
@@ -28,6 +28,10 @@ Status as of 2.0.2 (November 2026).
 - [x] #10 icon alignment: no longer reproduces (glyphs centered in both the card and flat layouts, Pure Black + Linear icons)
 - [x] #24 profile pages: follow the selected theme (checked with Pure Black)
 - [x] YouTube ID parsing for Shorts, `/live/`, `m.`, `youtu.be` and `youtube-nocookie` links (offline check)
+- [x] Vimeo in list view: `channels/<name>/<id>` links play; showcase links say they aren't a single video (offline check of 13 link forms, plus live)
+- [x] Accent color on the spots that used to stay orange (settings links, Legacy White picker, album thumbnails) with orange, blue and a custom color
+- [x] Media built through `attr()`/`css()`: list view (YouTube, youtu.be, attribution links, images, Imgur gifv, SoundCloud, Vimeo) and grid view (YouTube, Wikipedia, image, gifv, SoundCloud and Vimeo cards; YouTube, gifv and image overlays) still work; links containing quotes and `<img onerror>` add no elements and run nothing
+- [x] Grid text previews parse the fetched page off-page (only the page request itself is made)
 
 ## Still to test
 
@@ -37,7 +41,8 @@ Status as of 2.0.2 (November 2026).
 - [ ] Infinite scroll in grid view, and with RES's never-ending reddit
 - [ ] Old design served on www.reddit.com (old-reddit preference with the redirect off), which goes through `shine-detect.js`
 - [ ] Settings rows in dark themes
-- [ ] Firefox 128+: loading, host permission prompt, `moz-extension://` fonts (icon font and Open Sans), `scripting.executeScript` in the MAIN world
+- [ ] Firefox 128+ (`node tools/build-firefox.mjs`, then load `dist/firefox`): loading, host permission prompt, `moz-extension://` fonts (icon font and Open Sans), `scripting.executeScript` in the MAIN world
+- [ ] After clicking **Reload** on edge://extensions: the "'background.scripts' requires manifest version of 2 or lower" warning is gone (the key moved to the Firefox build)
 - [ ] Chrome (stable)
 
 ## Open upstream issues
@@ -47,8 +52,4 @@ Status as of 2.0.2 (November 2026).
 
 ## Cleanup and hardening
 
-- [ ] A few spots hard-code SHINE's original orange (`rgb(255,103,0)`: settings-panel links, the Legacy White theme picker border, front-page flair in grid view), so they stay orange under every accent color
-- [ ] Much of the list/grid HTML is still built by string concatenation. URLs are sanitized where they enter, and the riskier spots (third-party HTML, remote scripts) are fixed, but titles and other values could move to `.text()` and `.attr()`
-- [ ] List view's Vimeo embed uses everything after `vimeo.com/` as the ID, so `vimeo.com/channels/<name>/<id>` links don't play (grid view resolves these through oEmbed)
-- [ ] Edge lists "'background.scripts' requires manifest version of 2 or lower" on the extensions page. It's harmless (the key is there for Firefox); a separate Firefox manifest would remove it
-- [ ] Lint/format pass; the files mix tabs, spaces and CRLF/LF line endings
+- [ ] Optional: run ESLint over the hand-written scripts. Much of the old code uses implicit globals (`vidID`, `embedURL`, `timeStamp`); they work, but would be worth declaring

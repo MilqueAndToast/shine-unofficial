@@ -1,3 +1,6 @@
+html.SHINE.color-indigo {
+  --shine-color: #536DFE;
+  --shine-color-dark: #3D5AFE; }
 html.SHINE.color-indigo.res-nightmode.shine-list body > div.content div#siteTable.linklisting > .thing.active-thing {
   border-left: 5px solid #536DFE !important; }
   html.SHINE.color-indigo.res-nightmode.shine-list body > div.content div#siteTable.linklisting > .thing.active-thing:hover {
