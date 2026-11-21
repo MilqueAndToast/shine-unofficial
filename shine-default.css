@@ -1,5 +1,5 @@
 html.SHINE.shine-default #REScommentNavToggle{
-	display:none !important;
+    display:none !important;
 }
 
 html.SHINE body > div.content {
@@ -9,7 +9,7 @@ html.SHINE body > div.content {
 }
 
 html.SHINE body > div.content #siteTable .thing .RES-keyNav-activeElement{
-	background-color:transparent !important;
+    background-color:transparent !important;
 }
 
 html.SHINE body > div.content #siteTable .thing a.thumbnail {
@@ -24,11 +24,11 @@ html.SHINE.shine-default .panestack-title {
 }
 
 /*html.SHINE.shine-default .menuarea{
-	float:right;
+    float:right;
 }*/
 
 html.SHINE.shine-default .messages-page .menuarea{
-	float: none;
+    float: none;
     text-align: left;
     margin: 0px;
 }

@@ -2,23 +2,20 @@
 $('html').addClass("shine-ready");
 
 
-
-
 // this gets URL variables
 function getUrlVars(url) {
-    var vars = [], hash;
-    var hashes = url.slice(url.indexOf('?') + 1).split('&');
-    for (var i = 0; i < hashes.length; i++) {
-        hash = hashes[i].split('=');
-        vars.push(hash[0]);
-        vars[hash[0]] = hash[1];
-    }
-    return vars;
+	var vars = [], hash;
+	var hashes = url.slice(url.indexOf('?') + 1).split('&');
+	for (var i = 0; i < hashes.length; i++) {
+		hash = hashes[i].split('=');
+		vars.push(hash[0]);
+		vars[hash[0]] = hash[1];
+	}
+	return vars;
 }
 
 
 // this gets the ireddit picture url
-
 
 
 // shows a gif as an image
@@ -33,151 +30,145 @@ function shineShowGif(target, url){
 }
 
 
-
-
-
 // this gets the image type
 function getImageFromServer(path, id, target){
-    var xhr = new XMLHttpRequest();
-    xhr.path = path;
-    xhr.open("GET",path,true);
-    xhr.responseType = "arraybuffer";
-    xhr.onload = function(e){
-        
-        if(this.status == 200){
-            
-            var imageType = getImageType(this.response);
-			
+	var xhr = new XMLHttpRequest();
+	xhr.path = path;
+	xhr.open("GET",path,true);
+	xhr.responseType = "arraybuffer";
+	xhr.onload = function(e){
+
+		if(this.status == 200){
+
+			var imageType = getImageType(this.response);
+
 			if( imageType == "image/gif" ){
-      
+
 				// Imgur serves gifs as mp4 too. The old code put the .gif into a
 				// <video> tag, which browsers can't play (the "black gif" bug), and
 				// checked for the mp4 over http, which https pages block.
 				$.ajax({
-				    url: 'https://i.imgur.com/' + id + '.mp4',
-				    type: 'HEAD',
-				    error: function()
-				    {
+					url: 'https://i.imgur.com/' + id + '.mp4',
+					type: 'HEAD',
+					error: function()
+					{
 						shineRenderImage( $(target).find('.large-area'), 'https://i.imgur.com/' + id + '.gif' );
 						$(target).attr("data-original-type", "image");
 						$(target).attr("data-original-data", 'https://i.imgur.com/' + id + '.gif');
-				    },
-				    success: function ()
-				    {
+					},
+					success: function ()
+					{
 						shineRenderVideo( $(target).find('.large-area'), { mp4: 'https://i.imgur.com/' + id + '.mp4', silent: true } );
 						$(target).attr("data-original-type", "html5");
 						$(target).attr("data-original-data", 'https://i.imgur.com/' + id + '.mp4');
-				    }
+					}
 				});
-				
+
 			}else{
 
 				shineRenderImage( $(target).find('.large-area'), '//i.imgur.com/' + id + '.png' );
 
 				$(target).attr("data-original-type", "image");
 				$(target).attr("data-original-data", '//i.imgur.com/' + id + '.png');
-				
-			}  
-		      			
+
+			}
+
 		}
-        else{
-            console.log("Problem retrieving image " + JSON.stringify(e))
-        }
-    }
-    xhr.send();
+		else{
+			console.log("Problem retrieving image " + JSON.stringify(e))
+		}
+	}
+	xhr.send();
 }
 
 function getCommentImageFromServer(path, id, target){
-    var xhr = new XMLHttpRequest();
-    xhr.path = path;
-    xhr.open("GET",path,true);
-    xhr.responseType = "arraybuffer";
-    xhr.onload = function(e){
-        
-        if(this.status == 200){
-            
-            var imageType = getImageType(this.response);
-			
+	var xhr = new XMLHttpRequest();
+	xhr.path = path;
+	xhr.open("GET",path,true);
+	xhr.responseType = "arraybuffer";
+	xhr.onload = function(e){
+
+		if(this.status == 200){
+
+			var imageType = getImageType(this.response);
+
 			if( imageType == "image/gif" ){
 
 				$(target).addClass("shine-comment comment-html5");
 
 				$(target).attr("data-video", "//i.imgur.com/" + id + ".mp4");
-				
+
 			}else{
 
 				$(target).addClass("shine-comment comment-image");
 
 				$(target).attr("data-image", "//i.imgur.com/" + id + ".png");
-				
-			}  
-		      			
+
+			}
+
 		}
-        else{
-            console.log("Problem retrieving image " + JSON.stringify(e))
-        }
-    }
-    xhr.send();
+		else{
+			console.log("Problem retrieving image " + JSON.stringify(e))
+		}
+	}
+	xhr.send();
 }
 
 function getImageType(arrayBuffer){
-    var type = "";
-    var dv = new DataView(arrayBuffer,0,5);
-    var nume1 = dv.getUint8(0,true);
-    var nume2 = dv.getUint8(1,true);
-    var hex = nume1.toString(16) + nume2.toString(16) ;
-    switch(hex){
-        case "8950":
-            type = "image/png";
-            break;
-        case "4749":
-            type = "image/gif";
-            break;
-        case "424d":
-            type = "image/bmp";
-            break;
-        case "ffd8":
-            type = "image/jpeg";
-            break;
-        default:
-            type = null;
-            break;
-    }
-    return type;
+	var type = "";
+	var dv = new DataView(arrayBuffer,0,5);
+	var nume1 = dv.getUint8(0,true);
+	var nume2 = dv.getUint8(1,true);
+	var hex = nume1.toString(16) + nume2.toString(16) ;
+	switch(hex){
+		case "8950":
+			type = "image/png";
+			break;
+		case "4749":
+			type = "image/gif";
+			break;
+		case "424d":
+			type = "image/bmp";
+			break;
+		case "ffd8":
+			type = "image/jpeg";
+			break;
+		default:
+			type = null;
+			break;
+	}
+	return type;
 }
-
-
 
 
 // gets YOUTUBE TIME STAMP
 function getYouTubeTimeStamp(timeStamp){
-    
-    if(timeStamp != undefined){
-                
-        timeStamp = timeStamp.replace("s", "");
-        timeStamp = timeStamp.replace("S", "");
 
-        // if there are minutes
-        if ( timeStamp.toLowerCase().indexOf("m") != -1 ){
+	if(timeStamp != undefined){
 
-            timeStamp = timeStamp.split("m");
+		timeStamp = timeStamp.replace("s", "");
+		timeStamp = timeStamp.replace("S", "");
 
-            if(timeStamp[1]){
-                timeStamp = parseInt((timeStamp[0] * 60)) + parseInt(timeStamp[1]); 
-            }else{
-                timeStamp = parseInt((timeStamp[0] * 60)); 
-            }
+		// if there are minutes
+		if ( timeStamp.toLowerCase().indexOf("m") != -1 ){
 
-        }
+			timeStamp = timeStamp.split("m");
 
-    }else{
-        timeStamp = "0";
-    }
-    
-    return timeStamp;
-    
+			if(timeStamp[1]){
+				timeStamp = parseInt((timeStamp[0] * 60)) + parseInt(timeStamp[1]);
+			}else{
+				timeStamp = parseInt((timeStamp[0] * 60));
+			}
+
+		}
+
+	}else{
+		timeStamp = "0";
+	}
+
+	return timeStamp;
+
 }
-
 
 
 // these are all our actions / click events
@@ -219,7 +210,7 @@ function checkSideComments(){
 			if( url.toLowerCase().indexOf("/a/") != -1){
 
 				// we got an album
-				albumID = url.substr(url.toLowerCase().indexOf("/a/") + 3);	
+				albumID = url.substr(url.toLowerCase().indexOf("/a/") + 3);
 				albumID = shineImgurID( albumID );
 
 				$(theSideCommentLinks[i]).attr("data-video", shineImgurAlbumEmbed( albumID ));
@@ -227,13 +218,13 @@ function checkSideComments(){
 				$(theSideCommentLinks[i]).addClass("shine-comment comment-youtube");
 
 			// we have a gifv
-			}else if( url.toLowerCase().indexOf(".gifv") != -1 ){ 	
+			}else if( url.toLowerCase().indexOf(".gifv") != -1 ){
 
 				// we have a gifv
 				html5 = url.substr(url.toLowerCase().indexOf("imgur.com/") + 10);
 				html5 = html5.substring(0, html5.length - 5);
 
-				$(theSideCommentLinks[i]).attr("data-video", "//i.imgur.com/" + html5  + ".mp4");				
+				$(theSideCommentLinks[i]).attr("data-video", "//i.imgur.com/" + html5  + ".mp4");
 
 				$(theSideCommentLinks[i]).addClass("shine-comment comment-html5");
 
@@ -257,14 +248,14 @@ function checkSideComments(){
 				IMGURID = url.substr(url.toLowerCase().indexOf("imgur.com/") + 10);
 
 				if( IMGURID.indexOf(".tiff") != -1 || IMGURID.indexOf(".jpeg") != -1 ){
-					
+
 					IMGURID = IMGURID.substring(0, IMGURID.length - 5);
-					
+
 				}
 				else if( IMGURID.indexOf(".png") != -1 || IMGURID.indexOf(".jpg") != -1 || IMGURID.indexOf(".tif") != -1){
-				
+
 					IMGURID = IMGURID.substring(0, IMGURID.length - 4);
-				
+
 				}
 
 				$(theSideCommentLinks[i]).addClass("comment-" + i + "-" + IMGURID);
@@ -284,18 +275,17 @@ function checkSideComments(){
 			$(theSideCommentLinks[i]).addClass("shine-comment comment-image");
 
 		}
-        
-        
-        // this is for reddituploads.com
-        else if( url.toLowerCase().indexOf("reddituploads.com") != -1 ){
+
+
+		// this is for reddituploads.com
+		else if( url.toLowerCase().indexOf("reddituploads.com") != -1 ){
 
 			$(theSideCommentLinks[i]).attr("data-image", url);
 
 			$(theSideCommentLinks[i]).addClass("shine-comment comment-image");
 
 		}
-        
-        
+
 
 		// this is any other photo
 		else if( url.toLowerCase().indexOf(".png") != -1 || url.toLowerCase().indexOf(".jpg") != -1 || url.toLowerCase().indexOf(".jpeg") != -1 || url.toLowerCase().indexOf(".tif") != -1 || url.toLowerCase().indexOf(".tiff") != -1){
@@ -312,20 +302,20 @@ function checkSideComments(){
 			vidID = "";
 
 			if( url.toLowerCase().indexOf("attribution") != -1){
-                
-                vidID = getUrlVars(url)["u"];
-                vidID = decodeURIComponent(vidID);
-                vidID = getUrlVars(vidID)["v"];
-                                
-            }
-            else{
-            
-                vidID = shineYouTubeID(url) || getUrlVars(url)["v"];
-                                
-            }
-            
-            timeStamp = getUrlVars(url)["t"];
-            timeStamp = getYouTubeTimeStamp(timeStamp);
+
+				vidID = getUrlVars(url)["u"];
+				vidID = decodeURIComponent(vidID);
+				vidID = getUrlVars(vidID)["v"];
+
+			}
+			else{
+
+				vidID = shineYouTubeID(url) || getUrlVars(url)["v"];
+
+			}
+
+			timeStamp = getUrlVars(url)["t"];
+			timeStamp = getYouTubeTimeStamp(timeStamp);
 
 			$(theSideCommentLinks[i]).attr("data-video", shineYouTubeEmbed(vidID, timeStamp));
 
@@ -338,11 +328,11 @@ function checkSideComments(){
 		else if( url.toLowerCase().indexOf("youtu.be") != -1 ){
 
 			vidID = shineYouTubeID(url);
-            
-            timeStamp = getUrlVars(url)["t"];
-            timeStamp = getYouTubeTimeStamp(timeStamp);
 
-            $(theSideCommentLinks[i]).attr("data-video", shineYouTubeEmbed(vidID, timeStamp));
+			timeStamp = getUrlVars(url)["t"];
+			timeStamp = getYouTubeTimeStamp(timeStamp);
+
+			$(theSideCommentLinks[i]).attr("data-video", shineYouTubeEmbed(vidID, timeStamp));
 
 			$(theSideCommentLinks[i]).addClass("shine-comment comment-youtube");
 
@@ -370,7 +360,7 @@ function checkSideComments(){
 			$(topLevelComments[i]).find("ul.flat-list").first().append("<li class='inline-child-toggle'><a>hide / show child comments</a></li>");
 
 		}
-		
+
 	}
 
 
@@ -380,8 +370,6 @@ function checkSideComments(){
 	});
 
 }
-
-
 
 
 // OVERRIDES
@@ -396,7 +384,7 @@ $('body').on('click','div.content div#siteTable.linklisting > .thing .arrow', fu
 
 $('body').on('click','div.content div#siteTable.linklisting > .thing a.title', function(e){
 
-	e.preventDefault(); 
+	e.preventDefault();
 
 });
 
@@ -413,7 +401,7 @@ $('body').on('click','div.content div#siteTable.linklisting > .thing a.subreddit
 	e.stopPropagation();
 
 });
- 
+
 
 $('body').on('click','div.content div#siteTable.linklisting > .thing a.comments', function(e){
 
@@ -449,9 +437,9 @@ $('body').on('click','div.content div#siteTable.linklisting > .thing a.comments'
 
 		// NOW GRAB COMMENTS
 		$(theExpand).find('.side-comments').load( $(this).attr("href") + " div.content", function(){
-            
-            $(this).find('.expando').children('*').not('.usertext').remove();
-            $(this).find('.expando-button').remove();
+
+			$(this).find('.expando').children('*').not('.usertext').remove();
+			$(this).find('.expando-button').remove();
 
 			startCheckingComments = setInterval(checkSideComments, 1000);
 
@@ -533,7 +521,7 @@ $('body').on('click','div.content div#siteTable.linklisting > .thing:not(.shine-
 				$(theExpand).attr("data-original-data", shineImgurAlbumEmbed( albumID ));
 
 			}else if( url.toLowerCase().indexOf("/r/") != -1 ){
-			
+
 				$(theExpand).addClass("just-comments");
 
 				$(theExpand).attr("data-original-type", "comments");
@@ -551,7 +539,7 @@ $('body').on('click','div.content div#siteTable.linklisting > .thing:not(.shine-
 
 			}else if( url.toLowerCase().indexOf(".gifv") != -1 ){
 
-				
+
 				html5 = url.substr(url.toLowerCase().indexOf("imgur.com/") + 10);
 				html5 = html5.substring(0, html5.length - 5);
 
@@ -560,22 +548,22 @@ $('body').on('click','div.content div#siteTable.linklisting > .thing:not(.shine-
 				$(theExpand).attr("data-original-type", "html5");
 				$(theExpand).attr("data-original-data", '//i.imgur.com/' + html5  + '.mp4');
 
-			}else if( url.toLowerCase().indexOf(".gif") != -1 ){	
+			}else if( url.toLowerCase().indexOf(".gif") != -1 ){
 
 				html5 = url.substr(url.toLowerCase().indexOf("imgur.com/") + 10);
 				html5 = html5.substring(0, html5.length - 4);
-  
+
 				$.ajax({
-				    url: '//i.imgur.com/' + html5 + '.mp4',
-				    type: 'HEAD',
-				    error: function()
-				    {
+					url: '//i.imgur.com/' + html5 + '.mp4',
+					type: 'HEAD',
+					error: function()
+					{
 						shineShowGif(theExpand, url);
-				    },
-				    success: function ()
-				    {
+					},
+					success: function ()
+					{
 						shineRenderLoopVideo( $(theExpand).find('.large-area'), '//i.imgur.com/' + html5 + '.mp4' );
-				    }
+					}
 				});
 
 				$(theExpand).attr("data-original-type", "html5");
@@ -588,14 +576,14 @@ $('body').on('click','div.content div#siteTable.linklisting > .thing:not(.shine-
 				IMGURID = url.substr(url.toLowerCase().indexOf("imgur.com/") + 10);
 
 				if( IMGURID.toLowerCase().indexOf(".tiff") != -1 || IMGURID.toLowerCase().indexOf(".jpeg") != -1 ){
-					
+
 					IMGURID = IMGURID.substring(0, IMGURID.length - 5);
-					
+
 				}
 				else if( IMGURID.toLowerCase().indexOf(".png") != -1 || IMGURID.toLowerCase().indexOf(".jpg") != -1 || IMGURID.toLowerCase().indexOf(".tif") != -1){
-				
+
 					IMGURID = IMGURID.substring(0, IMGURID.length - 4);
-				
+
 				}
 
 				getImageFromServer("https://i.imgur.com/" + IMGURID + ".png", IMGURID, theExpand );
@@ -605,7 +593,6 @@ $('body').on('click','div.content div#siteTable.linklisting > .thing:not(.shine-
 
 		}
 
-		
 
 		// REGULAR OLD GIFS
 		else if( url.toLowerCase().indexOf(".gif") != -1 && url.toLowerCase().indexOf(".gifv") == -1 && url.toLowerCase().indexOf("/r/") == -1 ){
@@ -613,13 +600,11 @@ $('body').on('click','div.content div#siteTable.linklisting > .thing:not(.shine-
 			url = url.split(/[?#]/)[0]; // REMOVES QUERY STRING AND HASH
 
 			shineShowGif( theExpand, url );
-			
+
 		}
 
 
-
-        
-        // REDDIT UPLOADS
+		// REDDIT UPLOADS
 		else if( url.toLowerCase().indexOf("reddituploads.com") != -1){
 
 			shineRenderImage( $(theExpand).find('.large-area'), url );
@@ -628,10 +613,7 @@ $('body').on('click','div.content div#siteTable.linklisting > .thing:not(.shine-
 			$(theExpand).attr("data-original-data", url);
 
 		}
-        
-        
-        
-        
+
 
 		// ANY OTHER PICTURE
 		else if( url.toLowerCase().indexOf(".png") != -1 || url.toLowerCase().indexOf(".jpg") != -1 || url.toLowerCase().indexOf(".jpeg") != -1 || url.toLowerCase().indexOf(".tif") != -1 || url.toLowerCase().indexOf(".tiff") != -1){
@@ -644,8 +626,6 @@ $('body').on('click','div.content div#siteTable.linklisting > .thing:not(.shine-
 			$(theExpand).attr("data-original-data", url);
 
 		}
-
-
 
 
 		// LIVEMEME
@@ -666,34 +646,32 @@ $('body').on('click','div.content div#siteTable.linklisting > .thing:not(.shine-
 		}
 
 
-
-
 		//YOUTUBE
 		else if( url.toLowerCase().indexOf("youtube.com") != -1 && url.toLowerCase().indexOf("/r/youtube") == -1 ){
 
 			vidID = "";
 
-            if( url.toLowerCase().indexOf("attribution") != -1){
-                
-                vidID = getUrlVars(url)["u"];
-                vidID = decodeURIComponent(vidID);
-                vidID = getUrlVars(vidID)["v"];
-                                
-            }
-            else{
-            
-                vidID = shineYouTubeID(url) || getUrlVars(url)["v"];
-                                
-            }
-            
-            timeStamp = getUrlVars(url)["t"];
-            timeStamp = getYouTubeTimeStamp(timeStamp);
+			if( url.toLowerCase().indexOf("attribution") != -1){
 
-            embedURL = shineYouTubeEmbed(vidID, timeStamp);
+				vidID = getUrlVars(url)["u"];
+				vidID = decodeURIComponent(vidID);
+				vidID = getUrlVars(vidID)["v"];
 
-            shineRenderIframe( $(theExpand).find(".large-area"), embedURL );
+			}
+			else{
 
-            $(theExpand).attr("data-original-type", "youtube");
+				vidID = shineYouTubeID(url) || getUrlVars(url)["v"];
+
+			}
+
+			timeStamp = getUrlVars(url)["t"];
+			timeStamp = getYouTubeTimeStamp(timeStamp);
+
+			embedURL = shineYouTubeEmbed(vidID, timeStamp);
+
+			shineRenderIframe( $(theExpand).find(".large-area"), embedURL );
+
+			$(theExpand).attr("data-original-type", "youtube");
 			$(theExpand).attr("data-original-data", embedURL);
 
 		}
@@ -701,22 +679,22 @@ $('body').on('click','div.content div#siteTable.linklisting > .thing:not(.shine-
 
 		//STREAMABLE INTEGRATION BY u/itzblitz94
 		else if( url.toLowerCase().indexOf("streamable.com") != -1 ){
-      		embedURL = shineStreamableEmbed( url );
+			embedURL = shineStreamableEmbed( url );
 
-      		shineRenderIframe( $(theExpand).find(".large-area"), embedURL );
+			shineRenderIframe( $(theExpand).find(".large-area"), embedURL );
 
-      		$(theExpand).attr("data-original-type", "youtube");
+			$(theExpand).attr("data-original-type", "youtube");
 			$(theExpand).attr("data-original-data", embedURL);
 		}
 
 
 		//TWITCH CLIPS (clips.twitch.tv/slug and twitch.tv/channel/clip/slug)
 		else if( shineTwitchClipEmbed( url ) ){
-      		embedURL = shineTwitchClipEmbed( url );
+			embedURL = shineTwitchClipEmbed( url );
 
-      		shineRenderIframe( $(theExpand).find(".large-area"), embedURL );
+			shineRenderIframe( $(theExpand).find(".large-area"), embedURL );
 
-      		$(theExpand).attr("data-original-type", "youtube");
+			$(theExpand).attr("data-original-type", "youtube");
 			$(theExpand).attr("data-original-data", embedURL);
 		}
 
@@ -727,39 +705,38 @@ $('body').on('click','div.content div#siteTable.linklisting > .thing:not(.shine-
 
 		//PORNHUB.COM INTEGRATION
 		else if( url.toLowerCase().indexOf("pornhub.com") != -1 ){
-      		vidID = url.substr(url.toLowerCase().indexOf("?viewkey=") + 9).split(/[&#]/)[0];
-      		embedURL = '//www.pornhub.com/embed/' + encodeURIComponent(vidID);
+			vidID = url.substr(url.toLowerCase().indexOf("?viewkey=") + 9).split(/[&#]/)[0];
+			embedURL = '//www.pornhub.com/embed/' + encodeURIComponent(vidID);
 
-      		shineRenderIframe( $(theExpand).find(".large-area"), embedURL, "", { scrolling: "no" } );
+			shineRenderIframe( $(theExpand).find(".large-area"), embedURL, "", { scrolling: "no" } );
 
-      		$(theExpand).attr("data-original-type", "pornhub");
+			$(theExpand).attr("data-original-type", "pornhub");
 			$(theExpand).attr("data-original-data", embedURL);
 		}
 
 		//XHAMSTER.COM INTEGRATION
 		else if( url.toLowerCase().indexOf("xhamster.com") != -1 ){
-      		vidID = url.substr(url.toLowerCase().lastIndexOf("-") + 1).split(/[?#\/]/)[0];
-      		embedURL = '//xhamster.com/xembed.php?video=' + encodeURIComponent(vidID);
+			vidID = url.substr(url.toLowerCase().lastIndexOf("-") + 1).split(/[?#\/]/)[0];
+			embedURL = '//xhamster.com/xembed.php?video=' + encodeURIComponent(vidID);
 
-      		shineRenderIframe( $(theExpand).find(".large-area"), embedURL, "", { scrolling: "no" } );
+			shineRenderIframe( $(theExpand).find(".large-area"), embedURL, "", { scrolling: "no" } );
 
-      		$(theExpand).attr("data-original-type", "xhamster");
+			$(theExpand).attr("data-original-type", "xhamster");
 			$(theExpand).attr("data-original-data", embedURL);
 		}
 
 		//XVIDEOS.COM INTEGRATION
 		else if( url.toLowerCase().indexOf("xvideos.com") != -1 ){
-      		vidID = url.substr(url.toLowerCase().indexOf("/video") + 6);
-      		vidID = vidID.substr('-'+vidID.length,vidID.indexOf("/") + 1);
+			vidID = url.substr(url.toLowerCase().indexOf("/video") + 6);
+			vidID = vidID.substr('-'+vidID.length,vidID.indexOf("/") + 1);
 
-      		embedURL = '//flashservice.xvideos.com/embedframe/' + encodeURIComponent(vidID);
+			embedURL = '//flashservice.xvideos.com/embedframe/' + encodeURIComponent(vidID);
 
-      		shineRenderIframe( $(theExpand).find(".large-area"), embedURL, "", { scrolling: "no" } );
+			shineRenderIframe( $(theExpand).find(".large-area"), embedURL, "", { scrolling: "no" } );
 
-      		$(theExpand).attr("data-original-type", "xvideos");
+			$(theExpand).attr("data-original-type", "xvideos");
 			$(theExpand).attr("data-original-data", embedURL);
 		}
-
 
 
 		//YOUTUBE SHARE
@@ -767,22 +744,18 @@ $('body').on('click','div.content div#siteTable.linklisting > .thing:not(.shine-
 
 			vidID = shineYouTubeID(url);
 
-            timeStamp = getUrlVars(url)["t"];
-            timeStamp = getYouTubeTimeStamp(timeStamp);
+			timeStamp = getUrlVars(url)["t"];
+			timeStamp = getYouTubeTimeStamp(timeStamp);
 
-            embedURL = shineYouTubeEmbed(vidID, timeStamp);
+			embedURL = shineYouTubeEmbed(vidID, timeStamp);
 
 			shineRenderIframe( $(theExpand).find(".large-area"), embedURL );
 
 			$(theExpand).attr("data-original-type", "youtube");
 			$(theExpand).attr("data-original-data", embedURL);
-			
+
 
 		}
-
-
-
-
 
 
 		// VIMEO
@@ -807,43 +780,37 @@ $('body').on('click','div.content div#siteTable.linklisting > .thing:not(.shine-
 		}
 
 
-
-
-
 		//SOUNDCLOUD
-        else if( url.toLowerCase().indexOf("soundcloud.com") != -1 ){
+		else if( url.toLowerCase().indexOf("soundcloud.com") != -1 ){
 
 
-	        // SoundCloud player URL via oEmbed (the old resolve API needed a client
-	        // ID that no longer works, and the widget rejects on.soundcloud.com links)
-	        $(theExpand).find('.large-area').html('<div class="shine-media-message">Loading…</div>');
+			// SoundCloud player URL via oEmbed (the old resolve API needed a client
+			// ID that no longer works, and the widget rejects on.soundcloud.com links)
+			$(theExpand).find('.large-area').html('<div class="shine-media-message">Loading…</div>');
 
-	        (function(expand){
-		        shineSoundCloudEmbedAsync( url, true, function(soundCloudEmbed){
-			        shineRenderIframe( $(expand).find('.large-area'), soundCloudEmbed, "large-soundcloud", { scrolling: "no" } );
-			        $(expand).attr("data-original-type", "youtube");
-			        $(expand).attr("data-original-data", soundCloudEmbed);
-		        });
-	        })(theExpand);
-
-            
-        }
+			(function(expand){
+				shineSoundCloudEmbedAsync( url, true, function(soundCloudEmbed){
+					shineRenderIframe( $(expand).find('.large-area'), soundCloudEmbed, "large-soundcloud", { scrolling: "no" } );
+					$(expand).attr("data-original-type", "youtube");
+					$(expand).attr("data-original-data", soundCloudEmbed);
+				});
+			})(theExpand);
 
 
+		}
 
-        // (gfycat, v.redd.it and i.redd.it are handled at the top by shineUsesRedditMedia)
-        
-        
+
+		// (gfycat, v.redd.it and i.redd.it are handled at the top by shineUsesRedditMedia)
 
 
 		//REDDIT COMMENT
-        else if( url.toLowerCase().indexOf("reddit.com/r/") != -1 && url.toLowerCase().indexOf("comments") != -1 && url.toLowerCase().indexOf("np.reddit") == -1){
+		else if( url.toLowerCase().indexOf("reddit.com/r/") != -1 && url.toLowerCase().indexOf("comments") != -1 && url.toLowerCase().indexOf("np.reddit") == -1){
 
-	        url = url.split(/[?#]/)[0]; // REMOVES QUERY STRING AND HASH
+			url = url.split(/[?#]/)[0]; // REMOVES QUERY STRING AND HASH
 
-	        $(theExpand).addClass("just-comments");
+			$(theExpand).addClass("just-comments");
 
-	        $.ajax({
+			$.ajax({
 				url:url,
 				type:'GET',
 				success: function(data){
@@ -851,27 +818,26 @@ $('body').on('click','div.content div#siteTable.linklisting > .thing:not(.shine-
 					theContent = $(data).find(".commentarea");
 
 					$(theExpand).find('.side-comments').html( theContent );
-				
+
 				}
 			});
 
-	        dontloadComments = true;
+			dontloadComments = true;
 
-	        $(theExpand).attr("data-original-type", "comments");
+			$(theExpand).attr("data-original-type", "comments");
 			$(theExpand).attr("data-original-data", "comments");
-            
-		}
 
+		}
 
 
 /*
 		//REDDIT WIKI
-        else if( url.toLowerCase().indexOf("reddit.com/r/") != -1 && url.toLowerCase().indexOf("/wiki/index/") != -1){
+		else if( url.toLowerCase().indexOf("reddit.com/r/") != -1 && url.toLowerCase().indexOf("/wiki/index/") != -1){
 
-	        url = url.split(/[?#]/)[0]; // REMOVES QUERY STRING AND HASH
+			url = url.split(/[?#]/)[0]; // REMOVES QUERY STRING AND HASH
 
 
-	        $.ajax({
+			$.ajax({
 				url:url,
 				type:'GET',
 				success: function(data){
@@ -879,13 +845,13 @@ $('body').on('click','div.content div#siteTable.linklisting > .thing:not(.shine-
 					theContent = $(data).find(".wiki-page-content");
 
 					$(theExpand).find('.large-area').html( theContent );
-				
+
 				}
 			});
 
-	        $(theExpand).attr("data-original-type", "comments");
+			$(theExpand).attr("data-original-type", "comments");
 			$(theExpand).attr("data-original-data", "comments");
-            
+
 		}
 */
 
@@ -898,7 +864,7 @@ $('body').on('click','div.content div#siteTable.linklisting > .thing:not(.shine-
 
 			$(theExpand).attr("data-original-type", "comments");
 			$(theExpand).attr("data-original-data", "comments");
-            
+
 		}
 
 		else{
@@ -915,9 +881,9 @@ $('body').on('click','div.content div#siteTable.linklisting > .thing:not(.shine-
 
 			// NOW GRAB COMMENTS
 			$(theExpand).find('.side-comments').load( $(theLink).find("a.comments").attr("href") + " div.content", function(){
-                
-                $(this).find('.expando').children('*').not('.usertext').remove();
-                $(this).find('.expando-button').remove();
+
+				$(this).find('.expando').children('*').not('.usertext').remove();
+				$(this).find('.expando-button').remove();
 
 				startCheckingComments = setInterval(checkSideComments, 1000);
 
@@ -926,11 +892,8 @@ $('body').on('click','div.content div#siteTable.linklisting > .thing:not(.shine-
 		}
 
 
-
-
 		$('html,body').animate({ scrollTop: $(this).offset().top - 120 }, 'fast');
 
-		
 
 	}
 
@@ -947,8 +910,6 @@ $('body').on('click','.thing.link > .child', function(e){
 });
 
 
-
-
 $('body').on('click','div.content div#siteTable .thing ul.flat-list', function(e){
 
 	e.stopPropagation();
@@ -956,8 +917,8 @@ $('body').on('click','div.content div#siteTable .thing ul.flat-list', function(e
 });
 
 $('body').on('click','div#siteTable .thing form.hide-button a', function(e){
-    
-    $('#expand-' + $(this).parents('.thing').data("fullname") ).remove();
+
+	$('#expand-' + $(this).parents('.thing').data("fullname") ).remove();
 
 });
 
@@ -967,27 +928,27 @@ $('body').on('click','.album-thumbnails img', function(){
 
 	$(this).parents('.shine-expand').find('.large-album').trigger('zoom.destroy');
 
-    $(this).parents('.shine-expand').find('.large-album').zoom({url: $(this).data("image"), on: 'click'});
+	$(this).parents('.shine-expand').find('.large-album').zoom({url: $(this).data("image"), on: 'click'});
 
-    $(this).parents('.album-thumbnails').find('img').removeClass("active-thumb");
+	$(this).parents('.album-thumbnails').find('img').removeClass("active-thumb");
 
-    $(this).addClass("active-thumb");
+	$(this).addClass("active-thumb");
 
-    $(this).parents('.shine-expand').find('.album-captions').html("");
+	$(this).parents('.shine-expand').find('.album-captions').html("");
 
-    if( $(this).data("title") != null || $(this).data("description") != null ){
+	if( $(this).data("title") != null || $(this).data("description") != null ){
 
-  		$(this).parents('.shine-expand').find('.album-captions').html('<div class="show-captions"><svg version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" x="0px" y="0px" viewBox="-291 389 20 16" style="enable-background:new -291 389 20 16;" xml:space="preserve"><path d="M-273,389h-16c-1.1,0-2,0.9-2,2v12c0,1.1,0.9,2,2,2h16c1.1,0,2-0.9,2-2v-12C-271,389.9-271.9,389-273,389z M-289,397h4v2h-4V397z M-279,403h-10v-2h10V403z M-273,403h-4v-2h4V403z M-273,399h-10v-2h10V399z"/></svg></div><div class="caption-text"><strong></strong><p></p></div>');
+		$(this).parents('.shine-expand').find('.album-captions').html('<div class="show-captions"><svg version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" x="0px" y="0px" viewBox="-291 389 20 16" style="enable-background:new -291 389 20 16;" xml:space="preserve"><path d="M-273,389h-16c-1.1,0-2,0.9-2,2v12c0,1.1,0.9,2,2,2h16c1.1,0,2-0.9,2-2v-12C-271,389.9-271.9,389-273,389z M-289,397h4v2h-4V397z M-279,403h-10v-2h10V403z M-273,403h-4v-2h4V403z M-273,399h-10v-2h10V399z"/></svg></div><div class="caption-text"><strong></strong><p></p></div>');
 
-  		if( $(this).data("title") != "null" ){
-  			$(this).parents('.shine-expand').find('.caption-text strong').text($(this).data("title"));
-  		}
+		if( $(this).data("title") != "null" ){
+			$(this).parents('.shine-expand').find('.caption-text strong').text($(this).data("title"));
+		}
 
-  		if( $(this).data("description") != "null" ){
-  			$(this).parents('.shine-expand').find('.caption-text p').text($(this).data("description"));	
-  		}
+		if( $(this).data("description") != "null" ){
+			$(this).parents('.shine-expand').find('.caption-text p').text($(this).data("description"));
+		}
 
-  	}
+	}
 
 });
 
@@ -1016,78 +977,76 @@ $(document).keydown(function(e) {
 		return;
 	}
 
-    if( $('.active-album').length != -1 ){
+	if( $('.active-album').length != -1 ){
 
-    	theThumbs = $('.active-album').parents('.large-area').find('.album-thumbnails img');
+		theThumbs = $('.active-album').parents('.large-area').find('.album-thumbnails img');
 
-	    var code = (e.keyCode ? e.keyCode : e.which);
-	    if (code == 40) {
-	        //down pressed
+		var code = (e.keyCode ? e.keyCode : e.which);
+		if (code == 40) {
+			//down pressed
 
-	        for(i = 0; i < theThumbs.length; i++){
+			for(i = 0; i < theThumbs.length; i++){
 
-	        	if( $(theThumbs[i]).hasClass("active-thumb") ){
+				if( $(theThumbs[i]).hasClass("active-thumb") ){
 
-	        		if( i == theThumbs.length - 1 ){
+					if( i == theThumbs.length - 1 ){
 
-	        			// do nothing 
+						// do nothing
 
-	        			$('.active-album').removeClass("active-album");
+						$('.active-album').removeClass("active-album");
 
-	        		}else{
+					}else{
 
 						$(theThumbs[i+1]).click();
 
 						$('.active-album').parents('.large-area').find('.album-thumbnails').scrollTop($('.active-album').parents('.large-area').find('.album-thumbnails').scrollTop() + $('.active-album').parents('.large-area').find('.active-thumb').position().top);
 
 						e.preventDefault();
-					    e.stopPropagation();
-					    return false;
+						e.stopPropagation();
+						return false;
 
-	        		}
+					}
 
-	        		break;
+					break;
 
-	        	}
+				}
 
-	        }
+			}
 
-	        
 
-	    } else if (code == 38) {
-	        //up pressed
-	        
-	        for(i = 0; i < theThumbs.length; i++){
+		} else if (code == 38) {
+			//up pressed
 
-	        	if( $(theThumbs[i]).hasClass("active-thumb") ){
+			for(i = 0; i < theThumbs.length; i++){
 
-	        		if( i == 0 ){
+				if( $(theThumbs[i]).hasClass("active-thumb") ){
 
-	        			// do nothing
+					if( i == 0 ){
 
-	        			$('.active-album').removeClass("active-album");
+						// do nothing
 
-	        		}else{
+						$('.active-album').removeClass("active-album");
+
+					}else{
 
 						$(theThumbs[i-1]).click();
 
 						$('.active-album').parents('.large-area').find('.album-thumbnails').scrollTop($('.active-album').parents('.large-area').find('.album-thumbnails').scrollTop() + $('.active-album').parents('.large-area').find('.active-thumb').position().top);
 
 						e.preventDefault();
-					    e.stopPropagation();
-					    return false;
+						e.stopPropagation();
+						return false;
 
-	        		}
+					}
 
-	        		break;
+					break;
 
-	        	}
+				}
 
-	        }
+			}
 
-	    }
+		}
 
-	    
 
 	}
 
@@ -1100,71 +1059,53 @@ $('body').on('click','.toggle-child-comments', function(){
 });
 
 
-
-
-
-
-
-
 function replaceExpand(type,data,button){
-
 
 
   if( type === "comments" ){
 
 
-  	$(button).parents(".shine-expand").find(".large-area").html("");
-  	$(button).parents(".shine-expand").addClass("just-comments");
+	$(button).parents(".shine-expand").find(".large-area").html("");
+	$(button).parents(".shine-expand").addClass("just-comments");
 
-  	container = $(button).parents(".shine-expand").find('.side-comments');
+	container = $(button).parents(".shine-expand").find('.side-comments');
 	scrollTo = $(button);
 
 	container.scrollTop(
-	    scrollTo.offset().top - container.offset().top + container.scrollTop() - 100
+		scrollTo.offset().top - container.offset().top + container.scrollTop() - 100
 	);
 
 
   }else if( type === "image" ){
 
 
-
-    shineRenderImage( $(button).parents(".shine-expand").find(".large-area"), data );
-
-
+	shineRenderImage( $(button).parents(".shine-expand").find(".large-area"), data );
 
 
   }else if( type === "youtube"){
 
 
-
-
-    shineRenderIframe( $(button).parents(".shine-expand").find(".large-area"), data );
-
-
+	shineRenderIframe( $(button).parents(".shine-expand").find(".large-area"), data );
 
 
   }else if( type === "html5"){
 
 
-
-
-    shineRenderLoopVideo( $(button).parents(".shine-expand").find(".large-area"), data );
-
-
+	shineRenderLoopVideo( $(button).parents(".shine-expand").find(".large-area"), data );
 
 
   }else if( type === "reddit"){
 
-    shineShowRedditMediaIn( $(button).parents(".shine-expand"), data, "" );
+	shineShowRedditMediaIn( $(button).parents(".shine-expand"), data, "" );
 
   }
 
 
   if( !$(button).hasClass("closecommentmedia") ){
-    $('.shine-comment').removeClass("closecommentmedia");
-    $(button).addClass("closecommentmedia");
+	$('.shine-comment').removeClass("closecommentmedia");
+	$(button).addClass("closecommentmedia");
   }else{
-    $('.shine-comment').removeClass("closecommentmedia");
+	$('.shine-comment').removeClass("closecommentmedia");
   }
 
 }
@@ -1185,7 +1126,7 @@ function shineShowCommentMediaArea(link){
 		var container = expand.find('.side-comments');
 
 		container.scrollTop(
-		    $(link).offset().top - container.offset().top + container.scrollTop() - 100
+			$(link).offset().top - container.offset().top + container.scrollTop() - 100
 		);
 
 	}
@@ -1217,13 +1158,6 @@ $('html').on('click','.comment-html5:not(.closecommentmedia)', function(e){
 });
 
 
-
-
-
-
-
-
-
 $('html').not('.shinelight').on('click','.closecommentmedia', function(e){
 
   replaceExpand( $(this).parents('.shine-expand').attr("data-original-type"), $(this).parents('.shine-expand').attr("data-original-data"), $(this) );
@@ -1231,7 +1165,6 @@ $('html').not('.shinelight').on('click','.closecommentmedia', function(e){
   e.preventDefault();
 
 });
-
 
 
 $('body').on('click','.toggle-child-comments', function(){
@@ -1257,12 +1190,6 @@ $('body').on('click','.inline-child-toggle', function(){
 });
 
 
-
-
-
-
-
-
 $('body').on('focus','input, textarea', function(){
 	$('html').addClass("disable-shift");
 });
@@ -1273,7 +1200,7 @@ $('body').on('blur','input, textarea', function(){
 
 // RES Keyboard Navigation and closing posts
 $(document).on('keyup keydown', function(e){
-	
+
 	if(e.shiftKey && !$('html').hasClass("disable-shift") && !$('html').hasClass("shine-no-keys") && !$(e.target).is("input, textarea, select, [contenteditable]")){
 		$('.RES-keyNav-activeElement').parents('.thing').click();
 	}
@@ -1284,7 +1211,6 @@ $(document).on('keyup keydown', function(e){
 	}
 
 });
-
 
 
 function shineHREF(n){
@@ -1342,48 +1268,48 @@ if( $('body').hasClass('res') ){
 		}, 1);
 
 	}, false);
- 
+
 }else{
 
 
 	loading = false;
 
 	//SCROLLING FUNCTIONS
-    $(window).scroll(function(){
+	$(window).scroll(function(){
 
 		$('body').find('.thing.recommended-link').remove();
 
-        if( $(window).scrollTop() + $(window).height() >= $('body').height() - 1000 && loading == false ){
+		if( $(window).scrollTop() + $(window).height() >= $('body').height() - 1000 && loading == false ){
 
-            loading = true;
+			loading = true;
 
-            lastThing = $('body > .content #siteTable > .thing').last().attr('data-fullname');
-            lastNumber = $('body > .content #siteTable > .thing').last().find('.rank').text();
+			lastThing = $('body > .content #siteTable > .thing').last().attr('data-fullname');
+			lastNumber = $('body > .content #siteTable > .thing').last().find('.rank').text();
 
-            subReddit = window.location.href.split(/[?#]/)[0];
+			subReddit = window.location.href.split(/[?#]/)[0];
 
-        	$.ajax({
-		      url: subReddit + "?count=25&after=" + lastThing,
-		      cache: false,
-		      success: function(data) { 
+			$.ajax({
+			  url: subReddit + "?count=25&after=" + lastThing,
+			  cache: false,
+			  success: function(data) {
 
-			     window.location.hash = "shiny=" + lastThing;
+				 window.location.hash = "shiny=" + lastThing;
 
-			     $('body > .content #siteTable').append( shineThingsFromPage(data) );
+				 $('body > .content #siteTable').append( shineThingsFromPage(data) );
 
-			     loading = false;
+				 loading = false;
 
 				 shineHREF(lastNumber);
-			      
-			  },
-		      error: function(request, status, message) { 
-		      	console.log(message); 
-		      }
-		    });	
 
-        }
-        
-    });
+			  },
+			  error: function(request, status, message) {
+				console.log(message);
+			  }
+			});
+
+		}
+
+	});
 
 
 }

@@ -1,0 +1,36 @@
+root = true
+
+[*]
+charset = utf-8
+end_of_line = lf
+insert_final_newline = true
+trim_trailing_whitespace = true
+
+# Scripts and SCSS sources: tabs
+[*.{js,mjs,scss}]
+indent_style = tab
+indent_size = 4
+
+# Hand-written stylesheets
+[*.css]
+indent_style = space
+indent_size = 4
+
+# Stylesheets compiled from SCSS (themes/, colors/) keep the compiler's
+# 2-space output
+[{themes,colors}/*.css]
+indent_size = 2
+
+[*.json]
+indent_style = space
+indent_size = 3
+
+[*.md]
+trim_trailing_whitespace = false
+
+[*.min.{js,css}]
+charset = unset
+end_of_line = unset
+insert_final_newline = unset
+trim_trailing_whitespace = unset
+indent_style = unset

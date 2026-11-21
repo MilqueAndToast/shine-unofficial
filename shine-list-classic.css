@@ -1,6 +1,6 @@
 html.SHINE.shine-list.shine-list-classic body > div.content div#siteTable.linklisting{
-	width:calc(50% - 30px) !important;
-	float: left !important;
+    width:calc(50% - 30px) !important;
+    float: left !important;
     margin-left: 30px !important;
 }
 
@@ -10,14 +10,12 @@ html.SHINE.shine-list.shine-list-classic body > div.content .side-comments div#s
 }
 
 html.SHINE.shine-list.shine-list-classic body #shine-subreddit-header{
-	display:none !important;
+    display:none !important;
 }
 
 html.SHINE.shine-list.shine-list-classic body > div.content div#siteTable.linklisting{
-	margin-top:0px !important;
+    margin-top:0px !important;
 }
-
-
 
 
 /* DIFFERENT SIZES */
@@ -26,10 +24,10 @@ html.SHINE.shine-list.shine-list-classic .shine-expand {
     position: fixed !important;
     left: calc(50% + 30px) !important;
     width: calc(50% - 60px) !important;
-    box-shadow: rgba(0, 0, 0, 0.298039) 1px 1px 5px !important;    
+    box-shadow: rgba(0, 0, 0, 0.298039) 1px 1px 5px !important;
     overflow-y:auto !important;
     top: 75px !important;
-    height: calc(100% - 110px) !important;    
+    height: calc(100% - 110px) !important;
 }
 
 html.SHINE.shine-list.shine-list-classic.show-shortcuts .shine-expand {
@@ -55,10 +53,8 @@ html.SHINE.shine-list.shine-list-classic.show-multireddits.show-sidebar .shine-e
 /* END DIFFERENT SIZES */
 
 
-
-
 html.SHINE.shine-list.shine-list-classic .just-comments .large-area{
-	display:none !important;
+    display:none !important;
 }
 
 html.SHINE.shine-list.shine-list-classic .large-area {

@@ -1,7 +1,7 @@
 $white: rgb(255, 255, 255);
 $black: rgb(0, 0, 0);
 
-$color_gray_approx: rgba($white, .5); 
+$color_gray_approx: rgba($white, .5);
 $color_nobel_approx: rgba($white, .75);
 $color_quill_gray_approx: rgba($white, .8);
 $color_alto_approx: rgba($white, .85);
@@ -258,10 +258,10 @@ html.SHINE {
 				}
 			}
 			.spoiler-stamp {
-			    color: #ffa524;
-			    acronym {
-			        color: #ffa524;
-			    }
+				color: #ffa524;
+				acronym {
+					color: #ffa524;
+				}
 			}
 			.RESCloseButton {
 				border: 0;
@@ -291,7 +291,7 @@ html.SHINE {
 						color: $color_mountain_mist_approx !important;
 					}
 				}
-			} 
+			}
 			&.show-sidebar .side {
 				color: $color_nobel_approx;
 				.md {
@@ -349,12 +349,12 @@ html.SHINE {
 					color: $white !important;
 				}
 				&.submitter {
-					color: $white !important;			
+					color: $white !important;
 				}
 				&.admin {
-					color: $white !important;	
+					color: $white !important;
 				}
-			}		
+			}
 			.usertext.grayed .usertext-body div p {
 				color: $color_mountain_mist_approx;
 			}
@@ -374,14 +374,14 @@ html.SHINE {
 			transition: all 200ms ease;
 		}
 		#themeselect label.#{$themename} .foreground {
-	    	span {
-	    		color: $color_gallery_approx;
-	    	}
+			span {
+				color: $color_gallery_approx;
+			}
 		}
 
 		&.colorful {
 			.thumbnail.spoiler::before, .thumbnail.nsfw::before, .thumbnail.default::before, .thumbnail.image::before, .thumbnail.self::before {
-			    color: $white !important;
+				color: $white !important;
 			}
 		}
 	}

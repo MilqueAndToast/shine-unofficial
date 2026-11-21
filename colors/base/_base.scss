@@ -45,18 +45,18 @@ html.SHINE {
 					color: $color_main_accent;
 				}
 				.RESLoadingSpinner {
-					color: $color_main_accent;			
+					color: $color_main_accent;
 				}
 			}
 
 			div {
 				&#sr-header-area {
 					li.selected a {
-					    color: $color_main_accent !important;
+						color: $color_main_accent !important;
 					}
 				}
 			}
-		
+
 			#header-bottom-left {
 				#header-img-a::after, #header-img.default-header::after {
 					background-color: transparent !important;
@@ -106,25 +106,25 @@ html.SHINE {
 					color: $color_fab_color;
 				}
 				.RESLoadingSpinner {
-					color: $color_fab_color;			
+					color: $color_fab_color;
 				}
 			}
 
 			div {
 				&#sr-header-area {
 					li.selected a {
-					    color: $color_fab_color !important;
+						color: $color_fab_color !important;
 					}
 				}
 			}
-		
+
 			#header-bottom-left {
 				#header-img-a::after, #header-img.default-header::after {
 					background-color: transparent !important;
 				}
-			}			
+			}
 		}
-		
+
 		.shine-expand {
 			.side-comments button.save {
 				background: $color_main_accent !important;
@@ -143,7 +143,7 @@ html.SHINE {
 					}
 				}
 				li.selected a {
-				    color: $color_fab_color !important;
+					color: $color_fab_color !important;
 				}
 			}
 		}
@@ -161,8 +161,8 @@ html.SHINE {
 			transition: background-color 200ms;
 		}
 		#header-bottom-right a.message-count {
-		    color: white !important;
-		    background: $color_main_accent;
+			color: white !important;
+			background: $color_main_accent;
 		}
 
 		button {
@@ -179,20 +179,18 @@ html.SHINE {
 		}
 
 
-
 		&.colorful {
 			#header-bottom-left {
 				#header-img-a::after, #header-img.default-header::after {
 					background-color: $color_fab_color !important;
-			    	color: #fff;
+					color: #fff;
 				}
 			}
 
 			.thumbnail.spoiler::before, .thumbnail.nsfw::before, .thumbnail.default::before, .thumbnail.image::before, .thumbnail.self::before {
-			    background-color: $color_fab_color !important;
+				background-color: $color_fab_color !important;
 			}
 		}
-
 
 
 		&.accent {
@@ -208,25 +206,24 @@ html.SHINE {
 		}
 
 
-
 		&.colorlines {
 			.thumbnail.spoiler::before, .thumbnail.nsfw::before, .thumbnail.default::before, .thumbnail.image::before, .thumbnail.self::before {
 				background-color: transparent !important;
-			    border: 2px $color_main_accent solid !important;
-			    color: $color_main_accent !important;
-    			line-height: 46px;
+				border: 2px $color_main_accent solid !important;
+				color: $color_main_accent !important;
+				line-height: 46px;
 			}
 			&.modern-layout {
 				.thumbnail.spoiler::before, .thumbnail.nsfw::before, .thumbnail.default::before, .thumbnail.image::before, .thumbnail.self::before {
-				    border: 2px $color_fab_color solid !important;
-				    color: $color_fab_color !important;
-    				line-height: 56px !important;
-				}		
+					border: 2px $color_fab_color solid !important;
+					color: $color_fab_color !important;
+					line-height: 56px !important;
+				}
 			}
 		}
 
 		.archived-infobar::before {
-		    background-color: $color_fab_color;
+			background-color: $color_fab_color;
 		}
 	}
 

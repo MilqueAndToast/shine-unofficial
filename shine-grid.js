@@ -1,56 +1,20 @@
 // all the functions at the top
 
 
-
-
-
-
-
-
-
-
-
 // this gets URL variables
 function getUrlVars(url) {
-    var vars = [], hash;
-    var hashes = url.slice(url.indexOf('?') + 1).split('&');
-    for (var i = 0; i < hashes.length; i++) {
-        hash = hashes[i].split('=');
-        vars.push(hash[0]);
-        vars[hash[0]] = hash[1];
-    }
-    return vars;
+	var vars = [], hash;
+	var hashes = url.slice(url.indexOf('?') + 1).split('&');
+	for (var i = 0; i < hashes.length; i++) {
+		hash = hashes[i].split('=');
+		vars.push(hash[0]);
+		vars[hash[0]] = hash[1];
+	}
+	return vars;
 }
 
 
-
-
-
-
-
-
-
 // this function gets an imgur album image
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 
 
 // this gets our vimeo thumbnail
@@ -100,18 +64,17 @@ function getTwitchThumbnail(vidID, target){
 }
 
 
-
 // this gets what type of image we're dealing with
 function getImageFromServer(path, id, target){
-    var xhr = new XMLHttpRequest();
-    xhr.path = path;
-    xhr.open("GET",path,true);
-    xhr.responseType = "arraybuffer";
-    xhr.onload = function(e){
+	var xhr = new XMLHttpRequest();
+	xhr.path = path;
+	xhr.open("GET",path,true);
+	xhr.responseType = "arraybuffer";
+	xhr.onload = function(e){
 
-        if(this.status == 200){
+		if(this.status == 200){
 
-            var imageType = getImageType(this.response);
+			var imageType = getImageType(this.response);
 
 			if( imageType == "image/gif" ){
 
@@ -127,23 +90,23 @@ function getImageFromServer(path, id, target){
 			}
 
 		}
-        else{
-            console.log("Problem retrieving image " + JSON.stringify(e))
-        }
-    }
-    xhr.send();
+		else{
+			console.log("Problem retrieving image " + JSON.stringify(e))
+		}
+	}
+	xhr.send();
 }
 
 function getCommentImageFromServer(path, id, target){
-    var xhr = new XMLHttpRequest();
-    xhr.path = path;
-    xhr.open("GET",path,true);
-    xhr.responseType = "arraybuffer";
-    xhr.onload = function(e){
+	var xhr = new XMLHttpRequest();
+	xhr.path = path;
+	xhr.open("GET",path,true);
+	xhr.responseType = "arraybuffer";
+	xhr.onload = function(e){
 
-        if(this.status == 200){
+		if(this.status == 200){
 
-            var imageType = getImageType(this.response);
+			var imageType = getImageType(this.response);
 
 			if( imageType == "image/gif" ){
 
@@ -160,56 +123,41 @@ function getCommentImageFromServer(path, id, target){
 			}
 
 		}
-        else{
-            console.log("Problem retrieving image " + JSON.stringify(e))
-        }
-    }
-    xhr.send();
+		else{
+			console.log("Problem retrieving image " + JSON.stringify(e))
+		}
+	}
+	xhr.send();
 }
 
 function getImageType(arrayBuffer){
-    var type = "";
-    var dv = new DataView(arrayBuffer,0,5);
-    var nume1 = dv.getUint8(0,true);
-    var nume2 = dv.getUint8(1,true);
-    var hex = nume1.toString(16) + nume2.toString(16) ;
-    switch(hex){
-        case "8950":
-            type = "image/png";
-            break;
-        case "4749":
-            type = "image/gif";
-            break;
-        case "424d":
-            type = "image/bmp";
-            break;
-        case "ffd8":
-            type = "image/jpeg";
-            break;
-        default:
-            type = null;
-            break;
-    }
-    return type;
+	var type = "";
+	var dv = new DataView(arrayBuffer,0,5);
+	var nume1 = dv.getUint8(0,true);
+	var nume2 = dv.getUint8(1,true);
+	var hex = nume1.toString(16) + nume2.toString(16) ;
+	switch(hex){
+		case "8950":
+			type = "image/png";
+			break;
+		case "4749":
+			type = "image/gif";
+			break;
+		case "424d":
+			type = "image/bmp";
+			break;
+		case "ffd8":
+			type = "image/jpeg";
+			break;
+		default:
+			type = null;
+			break;
+	}
+	return type;
 }
 
 
-
-
-
-
-
-
-
 // this gets the ireddit picture url
-
-
-
-
-
-
-
-
 
 
 // previews a gif as an image
@@ -219,20 +167,6 @@ function shineShowGif(target, url){
 	$(target).find('.preview-replace').replaceWith( shineBackgroundDiv("preview preview-image", url).attr("data-url", url) );
 
 }
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 
 
 function getRedditText(url, content, target){
@@ -267,20 +201,6 @@ function getRedditText(url, content, target){
 	});
 
 }
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 
 
 function getWikiContent(articleURL, target){
@@ -318,14 +238,6 @@ function getWikiContent(articleURL, target){
 }
 
 
-
-
-
-
-
-
-
-
 // getting the Sound Cloud embed
 function getSoundCloudContent(soundCloudURL, target){
 
@@ -338,75 +250,33 @@ function getSoundCloudContent(soundCloudURL, target){
 }
 
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 function getYouTubeTimeStamp(timeStamp){
 
-    if(timeStamp != undefined){
+	if(timeStamp != undefined){
 
-        timeStamp = timeStamp.replace("s", "");
-        timeStamp = timeStamp.replace("S", "");
+		timeStamp = timeStamp.replace("s", "");
+		timeStamp = timeStamp.replace("S", "");
 
-        // if there are minutes
-        if ( timeStamp.toLowerCase().indexOf("m") != -1 ){
+		// if there are minutes
+		if ( timeStamp.toLowerCase().indexOf("m") != -1 ){
 
-            timeStamp = timeStamp.split("m");
+			timeStamp = timeStamp.split("m");
 
-            if(timeStamp[1]){
-                timeStamp = parseInt((timeStamp[0] * 60)) + parseInt(timeStamp[1]);
-            }else{
-                timeStamp = parseInt((timeStamp[0] * 60));
-            }
+			if(timeStamp[1]){
+				timeStamp = parseInt((timeStamp[0] * 60)) + parseInt(timeStamp[1]);
+			}else{
+				timeStamp = parseInt((timeStamp[0] * 60));
+			}
 
-        }
+		}
 
-    }else{
-        timeStamp = "0";
-    }
+	}else{
+		timeStamp = "0";
+	}
 
-    return timeStamp;
+	return timeStamp;
 
 }
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 
 
 // ADDING SHINE HTML TO OUR INTERFACE
@@ -427,36 +297,11 @@ $('body').append(''+
 );
 
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 // this javascript runs on the SHINE grid interface
 
 function createPreviews(theThings){
 
 	for( i = 0; i < theThings.length; i++ ){
-
-
 
 
 		// setting up variables
@@ -472,26 +317,17 @@ function createPreviews(theThings){
 
 
 		// global changes to every card
-   		if( $(theThings[i]).find('ul.flat-list a.comments').html() != undefined ){
+		if( $(theThings[i]).find('ul.flat-list a.comments').html() != undefined ){
 
-		    $(theThings[i]).find('ul.flat-list a.comments').html( $(theThings[i]).find('ul.flat-list a.comments').html().replace(/\D/g,'') );
+			$(theThings[i]).find('ul.flat-list a.comments').html( $(theThings[i]).find('ul.flat-list a.comments').html().replace(/\D/g,'') );
 
-   	 	}
+		}
 
 		$(theThings[i]).find('ul.flat-list a.comments').attr("target","_blank");
 		$(theThings[i]).find('a.title').attr("target","_blank");
 
 
-
-
-
-
-
 		// creating previews time
-
-
-
-
 
 
 		// REDDIT VIDEO (v.redd.it), REDDIT GALLERIES, AND GIF HOSTS THAT SHUT DOWN
@@ -576,12 +412,6 @@ function createPreviews(theThings){
 		}
 
 
-
-
-
-
-
-
 		// REGULAR OLD GIFS
 		else if( url.toLowerCase().indexOf(".gif") != -1 && url.toLowerCase().indexOf(".gifv") == -1 && url.toLowerCase().indexOf("/r/") == -1 ){
 
@@ -596,11 +426,6 @@ function createPreviews(theThings){
 		}
 
 
-
-
-
-
-
 		// ANY OTHER PICTURE
 		else if( url.toLowerCase().indexOf(".png") != -1 || url.toLowerCase().indexOf(".jpg") != -1 || url.toLowerCase().indexOf(".jpeg") != -1 || url.toLowerCase().indexOf(".tif") != -1 || url.toLowerCase().indexOf(".tiff") != -1){
 
@@ -613,26 +438,12 @@ function createPreviews(theThings){
 		}
 
 
-
-
-
-
-
-
-        // REDDIT UPLOADS
-        else if( url.toLowerCase().indexOf("reddituploads.com") != -1){
+		// REDDIT UPLOADS
+		else if( url.toLowerCase().indexOf("reddituploads.com") != -1){
 
 			$(theThings[i]).find(whereToPlace).append( shineBackgroundDiv("preview preview-image", url).attr("data-url", url) );
 
 		}
-
-
-
-
-
-
-
-
 
 
 		// LIVEMEME
@@ -650,67 +461,59 @@ function createPreviews(theThings){
 		}
 
 
-
-
-
-
-
 		//YOUTUBE
 		else if( url.toLowerCase().indexOf("youtube.com") != -1 && url.toLowerCase().indexOf("/r/youtube") == -1 ){
 
-            if( url.toLowerCase().indexOf("attribution") != -1){
+			if( url.toLowerCase().indexOf("attribution") != -1){
 
-                vidID = getUrlVars(url)["u"];
-                vidID = decodeURIComponent(vidID);
-                vidID = getUrlVars(vidID)["v"];
+				vidID = getUrlVars(url)["u"];
+				vidID = decodeURIComponent(vidID);
+				vidID = getUrlVars(vidID)["v"];
 
-                timeStamp = getUrlVars(url)["t"];
-                timeStamp = getYouTubeTimeStamp(timeStamp);
+				timeStamp = getUrlVars(url)["t"];
+				timeStamp = getYouTubeTimeStamp(timeStamp);
 
-                $(theThings[i]).find(whereToPlace).append( shineBackgroundDiv("preview preview-youtube", "https://img.youtube.com/vi/" + encodeURIComponent(vidID || "") + "/0.jpg").attr("data-video", shineYouTubeEmbed(vidID, timeStamp)) );
+				$(theThings[i]).find(whereToPlace).append( shineBackgroundDiv("preview preview-youtube", "https://img.youtube.com/vi/" + encodeURIComponent(vidID || "") + "/0.jpg").attr("data-video", shineYouTubeEmbed(vidID, timeStamp)) );
 
 
-            }
-            else{
+			}
+			else{
 
-                vidID = shineYouTubeID(url) || getUrlVars(url)["v"];
+				vidID = shineYouTubeID(url) || getUrlVars(url)["v"];
 
-                timeStamp = getUrlVars(url)["t"];
-                timeStamp = getYouTubeTimeStamp(timeStamp);
+				timeStamp = getUrlVars(url)["t"];
+				timeStamp = getYouTubeTimeStamp(timeStamp);
 
-                $(theThings[i]).find(whereToPlace).append( shineBackgroundDiv("preview preview-youtube", "https://img.youtube.com/vi/" + encodeURIComponent(vidID || "") + "/0.jpg").attr("data-video", shineYouTubeEmbed(vidID, timeStamp)) );
+				$(theThings[i]).find(whereToPlace).append( shineBackgroundDiv("preview preview-youtube", "https://img.youtube.com/vi/" + encodeURIComponent(vidID || "") + "/0.jpg").attr("data-video", shineYouTubeEmbed(vidID, timeStamp)) );
 
-            }
+			}
 
 		}
 
 
+	//STREAMABLE INTEGRATION BY u/itzblitz94
+	else if(url.toLowerCase().indexOf("streamable.com") != -1){
+	  url = url.split(/[?#]/)[0]; // REMOVES QUERY STRING AND HASH
+	  url = decodeURIComponent(url);
+	  shortcode = url.substr(url.toLowerCase().indexOf("streamable.com/") + 15);
 
-    //STREAMABLE INTEGRATION BY u/itzblitz94
-    else if(url.toLowerCase().indexOf("streamable.com") != -1){
-      url = url.split(/[?#]/)[0]; // REMOVES QUERY STRING AND HASH
-      url = decodeURIComponent(url);
-      shortcode = url.substr(url.toLowerCase().indexOf("streamable.com/") + 15);
+	  $(theThings[i]).find(whereToPlace).append("<div class='preview preview-replace'></div>");
 
-      $(theThings[i]).find(whereToPlace).append("<div class='preview preview-replace'></div>");
-
-      shineGridEmbedPreview( theThings[i], url );
-    }
-
-
-    //CLIPS.TWITCH.TV INTEGRATION
-    else if( shineTwitchClipEmbed( url ) ){
-
-          $(theThings[i]).find(whereToPlace).append("<div class='preview preview-replace'></div>");
-
-          shineGridEmbedPreview( theThings[i], url );
-
-    }
+	  shineGridEmbedPreview( theThings[i], url );
+	}
 
 
-    //v.redd.it
-    
+	//CLIPS.TWITCH.TV INTEGRATION
+	else if( shineTwitchClipEmbed( url ) ){
 
+		  $(theThings[i]).find(whereToPlace).append("<div class='preview preview-replace'></div>");
+
+		  shineGridEmbedPreview( theThings[i], url );
+
+	}
+
+
+	//v.redd.it
 
 
 		//YOUTUBE SHARE
@@ -718,22 +521,15 @@ function createPreviews(theThings){
 
 
 			vidID = url.substr(url.toLowerCase().indexOf("youtu.be/") + 9);
-            vidID = vidID.split(/[?#]/)[0]; // REMOVES QUERY STRING AND HASH
+			vidID = vidID.split(/[?#]/)[0]; // REMOVES QUERY STRING AND HASH
 
-            timeStamp = getUrlVars(url)["t"];
-            timeStamp = getYouTubeTimeStamp(timeStamp);
+			timeStamp = getUrlVars(url)["t"];
+			timeStamp = getYouTubeTimeStamp(timeStamp);
 
-            $(theThings[i]).find(whereToPlace).append( shineBackgroundDiv("preview preview-youtube", "https://img.youtube.com/vi/" + encodeURIComponent(vidID || "") + "/0.jpg").attr("data-video", shineYouTubeEmbed(vidID, timeStamp)) );
+			$(theThings[i]).find(whereToPlace).append( shineBackgroundDiv("preview preview-youtube", "https://img.youtube.com/vi/" + encodeURIComponent(vidID || "") + "/0.jpg").attr("data-video", shineYouTubeEmbed(vidID, timeStamp)) );
 
 
 		}
-
-
-
-
-
-
-
 
 
 		// VIMEO
@@ -745,20 +541,12 @@ function createPreviews(theThings){
 
 			$(theThings[i]).find(whereToPlace).append("<div class='preview preview-replace'></div>");
 
-            getVimeoThumbnail(vidID,  ".id-" + $(theThings[i]).attr("data-fullname"));
+			getVimeoThumbnail(vidID,  ".id-" + $(theThings[i]).attr("data-fullname"));
 
 		}
 
-        
-        
-        
-        // i.reddit.com uploads
-        
 
-
-
-
-
+		// i.reddit.com uploads
 
 
 		//SELF POST POST
@@ -773,29 +561,16 @@ function createPreviews(theThings){
 		}
 
 
-
-
-
-
-
-
-
 		//REDDIT COMMENT
-        else if( url.toLowerCase().indexOf("reddit.com/r/") != -1 && url.toLowerCase().indexOf("comments") != -1 && url.toLowerCase().indexOf("np.reddit") == -1){
+		else if( url.toLowerCase().indexOf("reddit.com/r/") != -1 && url.toLowerCase().indexOf("comments") != -1 && url.toLowerCase().indexOf("np.reddit") == -1){
 
-	        url = url.split(/[?#]/)[0]; // REMOVES QUERY STRING AND HASH
+			url = url.split(/[?#]/)[0]; // REMOVES QUERY STRING AND HASH
 
-	        $(theThings[i]).find(whereToPlace).append("<div class='preview preview-replace'></div>");
+			$(theThings[i]).find(whereToPlace).append("<div class='preview preview-replace'></div>");
 
-	        getRedditText(url, ".usertext.border .md", ".id-" + $(theThings[i]).attr("data-fullname") );
+			getRedditText(url, ".usertext.border .md", ".id-" + $(theThings[i]).attr("data-fullname") );
 
 		}
-
-
-
-
-
-
 
 
 		//WIKIPEDIA
@@ -811,37 +586,16 @@ function createPreviews(theThings){
 		}
 
 
-
-
-
-
-
 		//SOUNDCLOUD
-        else if( url.toLowerCase().indexOf("soundcloud.com") != -1 ){
+		else if( url.toLowerCase().indexOf("soundcloud.com") != -1 ){
 
-	        url = url.split(/[?#]/)[0]; // REMOVES QUERY STRING AND HASH
+			url = url.split(/[?#]/)[0]; // REMOVES QUERY STRING AND HASH
 
-            $(theThings[i]).find(whereToPlace).append("<div class='preview preview-replace'></div>");
+			$(theThings[i]).find(whereToPlace).append("<div class='preview preview-replace'></div>");
 
-            getSoundCloudContent( url,  ".id-" + $(theThings[i]).attr("data-fullname") );
+			getSoundCloudContent( url,  ".id-" + $(theThings[i]).attr("data-fullname") );
 
-        }
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
+		}
 
 
 		// IF NO PREVIEW
@@ -850,9 +604,6 @@ function createPreviews(theThings){
 			$(theThings[i]).addClass("nopreview");
 
 		}
-
-
-
 
 
 		$(theThings[i]).addClass("shined");
@@ -870,22 +621,6 @@ createPreviews( $('body > .content #siteTable .thing') );
 shineWatchNewThings("shined", function(fresh){
 	createPreviews( fresh );
 });
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 
 
 // when RES loads new things, run our JS on them
@@ -908,60 +643,49 @@ if( $('body').hasClass('res') ){
 	loading = false;
 
 	//SCROLLING FUNCTIONS
-    $(window).scroll(function(){
+	$(window).scroll(function(){
 
-        if( $(window).scrollTop() + $(window).height() >= $('body').height() - 1000 && loading == false ){
+		if( $(window).scrollTop() + $(window).height() >= $('body').height() - 1000 && loading == false ){
 
-            loading = true;
+			loading = true;
 
-            lastThing = $('body > .content #siteTable > .thing').last().attr('data-fullname');
+			lastThing = $('body > .content #siteTable > .thing').last().attr('data-fullname');
 
-            subReddit = window.location.href.split(/[?#]/)[0];
+			subReddit = window.location.href.split(/[?#]/)[0];
 
-        	$.ajax({
-		      url: subReddit + "?count=25&after=" + lastThing,
-		      cache: false,
-		      success: function(data) {
+			$.ajax({
+			  url: subReddit + "?count=25&after=" + lastThing,
+			  cache: false,
+			  success: function(data) {
 
-			     window.location.hash = "shiny=" + lastThing;
+				 window.location.hash = "shiny=" + lastThing;
 
-			     $('body > .content #siteTable').append( shineThingsFromPage(data) );
+				 $('body > .content #siteTable').append( shineThingsFromPage(data) );
 
-			     createPreviews( $('body > .content #siteTable .thing').not(".shined") );
+				 createPreviews( $('body > .content #siteTable .thing').not(".shined") );
 
-			     loading = false;
+				 loading = false;
 
-          var loadingLimit = $('body').attr('data-grid-limit');
-          //console.log(loadingLimit);
-          if(loadingLimit != 0) {
-            if ($('#siteTable').find('.thing').length >= loadingLimit) {
-              $('#siteTable').find('.thing:lt(25)').remove();
-            }
-          }
+		  var loadingLimit = $('body').attr('data-grid-limit');
+		  //console.log(loadingLimit);
+		  if(loadingLimit != 0) {
+			if ($('#siteTable').find('.thing').length >= loadingLimit) {
+			  $('#siteTable').find('.thing:lt(25)').remove();
+			}
+		  }
 
 			  },
-		      error: function(request, status, message) {
-		      	console.log(message);
-		      }
-		    });
+			  error: function(request, status, message) {
+				console.log(message);
+			  }
+			});
 
-        }
+		}
 
-    });
+	});
 
 
 }
-
-
-
-
-
-
-
-
-
-
-
 
 
 var startCheckingComments;
@@ -991,10 +715,9 @@ function resetInterfaces(){
 	$('.shine-grid .shine-expand .side-comments').html("");
 	$('html').removeClass("show-settings");
 	$('html').removeClass("shine-hide-children");
-    $('.album-captions').html("");
+	$('.album-captions').html("");
 
 }
-
 
 
 function checkSideComments(){
@@ -1081,8 +804,7 @@ function checkSideComments(){
 		}
 
 
-
-        // this is reddit uploads
+		// this is reddit uploads
 		else if( url.toLowerCase().indexOf("reddituploads.com") != -1){
 
 			$(theSideCommentLinks[i]).attr("data-image", url);
@@ -1090,7 +812,6 @@ function checkSideComments(){
 			$(theSideCommentLinks[i]).addClass("shine-comment comment-image");
 
 		}
-
 
 
 		// this is any other photo
@@ -1109,19 +830,19 @@ function checkSideComments(){
 
 			if( url.toLowerCase().indexOf("attribution") != -1){
 
-                vidID = getUrlVars(url)["u"];
-                vidID = decodeURIComponent(vidID);
-                vidID = getUrlVars(vidID)["v"];
+				vidID = getUrlVars(url)["u"];
+				vidID = decodeURIComponent(vidID);
+				vidID = getUrlVars(vidID)["v"];
 
-            }
-            else{
+			}
+			else{
 
-                vidID = shineYouTubeID(url) || getUrlVars(url)["v"];
+				vidID = shineYouTubeID(url) || getUrlVars(url)["v"];
 
-            }
+			}
 
-            timeStamp = getUrlVars(url)["t"];
-            timeStamp = getYouTubeTimeStamp(timeStamp);
+			timeStamp = getUrlVars(url)["t"];
+			timeStamp = getYouTubeTimeStamp(timeStamp);
 
 			$(theSideCommentLinks[i]).attr("data-video", shineYouTubeEmbed(vidID, timeStamp));
 
@@ -1135,10 +856,10 @@ function checkSideComments(){
 
 			vidID = url.substr(url.toLowerCase().indexOf("youtu.be/") + 9);
 
-            timeStamp = getUrlVars(url)["t"];
-            timeStamp = getYouTubeTimeStamp(timeStamp);
+			timeStamp = getUrlVars(url)["t"];
+			timeStamp = getYouTubeTimeStamp(timeStamp);
 
-            $(theSideCommentLinks[i]).attr("data-video", shineYouTubeEmbed(vidID, timeStamp));
+			$(theSideCommentLinks[i]).attr("data-video", shineYouTubeEmbed(vidID, timeStamp));
 
 			$(theSideCommentLinks[i]).addClass("shine-comment comment-youtube");
 
@@ -1157,7 +878,7 @@ function checkSideComments(){
 
 	for( i = 0; i < topLevelComments.length; i++ ){
 
-    commentNumber = -1;
+	commentNumber = -1;
 		$(topLevelComments[i]).addClass("been-shined comment-"+i);
 
 		theChildren = $(topLevelComments[i]).find('.child .sitetable');
@@ -1180,13 +901,12 @@ function checkSideComments(){
 }
 
 
-
 function loadSideComments(target, url){
 
 	$(target).load( url + " div.content", function(){
 
-        $(this).find('.expando').children('*').not('.usertext').remove();
-        $(this).find('.expando-button').remove();
+		$(this).find('.expando').children('*').not('.usertext').remove();
+		$(this).find('.expando-button').remove();
 
 		startCheckingComments = setInterval(checkSideComments, 1000);
 
@@ -1239,7 +959,6 @@ $('body').on('click','.preview-reddit', function(){
 });
 
 
-
 $('body').on('click','.preview-gifv', function(){
 
 	resetInterfaces();
@@ -1254,7 +973,6 @@ $('body').on('click','.preview-gifv', function(){
   $('.shine-expand').attr("data-original-data", $(this).data("video"));
 
 });
-
 
 
 $('body').on('click','.preview-vimeo', function(){
@@ -1273,34 +991,33 @@ $('body').on('click','.preview-vimeo', function(){
 });
 
 
-
 $('body').on('click','.album-thumbnails img', function(){
 
 	$('.large-album').css("background-image", shineCSSURL( $(this).attr("data-image") ) );
 
 	$('.shine-expand .large-album').trigger('zoom.destroy');
 
-    $('.shine-expand .large-album').zoom({url: $(this).data("image"), on: 'click'});
+	$('.shine-expand .large-album').zoom({url: $(this).data("image"), on: 'click'});
 
-    $('.album-thumbnails img').removeClass("active-thumb");
+	$('.album-thumbnails img').removeClass("active-thumb");
 
-    $(this).addClass("active-thumb");
+	$(this).addClass("active-thumb");
 
-    $('.album-captions').html("");
+	$('.album-captions').html("");
 
-    if( $(this).data("title") != null || $(this).data("description") != null ){
+	if( $(this).data("title") != null || $(this).data("description") != null ){
 
-  		$('.album-captions').html('<div class="show-captions"><svg version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" x="0px" y="0px" viewBox="-291 389 20 16" style="enable-background:new -291 389 20 16;" xml:space="preserve"><path d="M-273,389h-16c-1.1,0-2,0.9-2,2v12c0,1.1,0.9,2,2,2h16c1.1,0,2-0.9,2-2v-12C-271,389.9-271.9,389-273,389z M-289,397h4v2h-4V397z M-279,403h-10v-2h10V403z M-273,403h-4v-2h4V403z M-273,399h-10v-2h10V399z"/></svg></div><div class="caption-text"><strong></strong><p></p></div>');
+		$('.album-captions').html('<div class="show-captions"><svg version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" x="0px" y="0px" viewBox="-291 389 20 16" style="enable-background:new -291 389 20 16;" xml:space="preserve"><path d="M-273,389h-16c-1.1,0-2,0.9-2,2v12c0,1.1,0.9,2,2,2h16c1.1,0,2-0.9,2-2v-12C-271,389.9-271.9,389-273,389z M-289,397h4v2h-4V397z M-279,403h-10v-2h10V403z M-273,403h-4v-2h4V403z M-273,399h-10v-2h10V399z"/></svg></div><div class="caption-text"><strong></strong><p></p></div>');
 
-  		if( $(this).data("title") != "null" ){
-  			$('.caption-text strong').text($(this).data("title"));
-  		}
+		if( $(this).data("title") != "null" ){
+			$('.caption-text strong').text($(this).data("title"));
+		}
 
-  		if( $(this).data("description") != "null" ){
-  			$('.caption-text p').text($(this).data("description"));
-  		}
+		if( $(this).data("description") != "null" ){
+			$('.caption-text p').text($(this).data("description"));
+		}
 
-  	}
+	}
 
 });
 
@@ -1322,66 +1039,66 @@ $(document).keydown(function(e) {
 		return;
 	}
 
-    if( $('html').hasClass("expand-albums") ){
+	if( $('html').hasClass("expand-albums") ){
 
-    	theThumbs = $('.album-thumbnails img');
+		theThumbs = $('.album-thumbnails img');
 
-	    var code = (e.keyCode ? e.keyCode : e.which);
-	    if (code == 40) {
-	        //down pressed
+		var code = (e.keyCode ? e.keyCode : e.which);
+		if (code == 40) {
+			//down pressed
 
-	        for(i = 0; i < theThumbs.length; i++){
+			for(i = 0; i < theThumbs.length; i++){
 
-	        	if( $(theThumbs[i]).hasClass("active-thumb") ){
+				if( $(theThumbs[i]).hasClass("active-thumb") ){
 
-	        		if( i == theThumbs.length - 1 ){
+					if( i == theThumbs.length - 1 ){
 
-	        			$(theThumbs[0]).click();
+						$(theThumbs[0]).click();
 
-	        		}else{
+					}else{
 
 						$(theThumbs[i+1]).click();
 
-	        		}
+					}
 
-	        		break;
+					break;
 
-	        	}
+				}
 
-	        }
+			}
 
-	        $('.album-thumbnails').scrollTop($('.album-thumbnails').scrollTop() + $('.active-thumb').position().top);
+			$('.album-thumbnails').scrollTop($('.album-thumbnails').scrollTop() + $('.active-thumb').position().top);
 
-	    } else if (code == 38) {
-	        //up pressed
+		} else if (code == 38) {
+			//up pressed
 
-	        for(i = 0; i < theThumbs.length; i++){
+			for(i = 0; i < theThumbs.length; i++){
 
-	        	if( $(theThumbs[i]).hasClass("active-thumb") ){
+				if( $(theThumbs[i]).hasClass("active-thumb") ){
 
-	        		if( i == 0 ){
+					if( i == 0 ){
 
-	        			$(theThumbs[theThumbs.length - 1]).click();
+						$(theThumbs[theThumbs.length - 1]).click();
 
-	        		}else{
+					}else{
 
 						$(theThumbs[i-1]).click();
 
-	        		}
+					}
 
-	        		break;
+					break;
 
-	        	}
+				}
 
-	        }
+			}
 
-	        $('.album-thumbnails').scrollTop($('.album-thumbnails').scrollTop() + $('.active-thumb').position().top);
+			$('.album-thumbnails').scrollTop($('.album-thumbnails').scrollTop() + $('.active-thumb').position().top);
 
-	    }
+		}
 
-	    e.preventDefault();
-	    e.stopPropagation();
-	    return false;
+		e.preventDefault();
+		e.stopPropagation();
+		return false;
 
 	}
 
@@ -1410,7 +1127,6 @@ $('body').on('click','.thing.shined a.comments', function(e){
 });
 
 
-
 function clearExpandStuff(){
 
 	$('html').removeClass("expand-images");
@@ -1428,16 +1144,6 @@ function clearExpandStuff(){
 }
 
 
-
-
-
-
-
-
-
-
-
-
 function replaceExpand(type,data,button){
 
 
@@ -1445,7 +1151,7 @@ function replaceExpand(type,data,button){
 
   if( $('html').hasClass("expand-comments") ){
 
-    jumpTime = true;
+	jumpTime = true;
 
   }
 
@@ -1453,96 +1159,70 @@ function replaceExpand(type,data,button){
   clearExpandStuff();
 
 
-
   if( type === "comments" ){
 
 
-    clearExpandStuff();
+	clearExpandStuff();
 
-    $('html').addClass("expand-comments");
+	$('html').addClass("expand-comments");
 
-    jumpTime = true;
+	jumpTime = true;
 
 
   }else if( type === "image" ){
 
 
+	$('.shine-expand .large-image').css("background-image", shineCSSURL(data) );
 
-    $('.shine-expand .large-image').css("background-image", shineCSSURL(data) );
+	$('.shine-expand .large-image').zoom({url: data, on: 'click'});
 
-    $('.shine-expand .large-image').zoom({url: data, on: 'click'});
-
-    $('html').addClass("expand-images");
-
-
+	$('html').addClass("expand-images");
 
 
   }else if( type === "youtube"){
 
 
+	$('.shine-expand .large-youtube').empty().append( shineIframe(data) );
 
-
-    $('.shine-expand .large-youtube').empty().append( shineIframe(data) );
-
-    $('html').addClass("expand-youtubes");
-
-
+	$('html').addClass("expand-youtubes");
 
 
   }else if( type === "html5"){
 
 
+	$('.shine-expand .large-html5').empty().append( shineLoopVideo(data) );
 
-
-    $('.shine-expand .large-html5').empty().append( shineLoopVideo(data) );
-
-    $('html').addClass("expand-html5s");
-
-
+	$('html').addClass("expand-html5s");
 
 
   }else if( type === "reddit"){
 
-    shineGridOpenRedditMedia( data );
+	shineGridOpenRedditMedia( data );
 
   }
-
-
-
-
-
 
 
   if( jumpTime ){
 
-    container = $('.side-comments');
-      scrollTo = button;
+	container = $('.side-comments');
+	  scrollTo = button;
 
-    container.scrollTop(
-        scrollTo.offset().top - container.offset().top + container.scrollTop() - 100
-    );
+	container.scrollTop(
+		scrollTo.offset().top - container.offset().top + container.scrollTop() - 100
+	);
 
   }
-
-
 
 
   if( !$(button).hasClass("closecommentmedia") ){
-    $('.shine-comment').removeClass("closecommentmedia");
-    $(button).addClass("closecommentmedia");
+	$('.shine-comment').removeClass("closecommentmedia");
+	$(button).addClass("closecommentmedia");
   }else{
-    $('.shine-comment').removeClass("closecommentmedia");
+	$('.shine-comment').removeClass("closecommentmedia");
   }
 
 
-
-
-
 }
-
-
-
-
 
 
 $('html').not('.shinelight').on('click','.comment-image:not(.closecommentmedia)',function(e){
@@ -1554,10 +1234,6 @@ $('html').not('.shinelight').on('click','.comment-image:not(.closecommentmedia)'
 });
 
 
-
-
-
-
 $('html').not('.shinelight').on('click','.comment-youtube:not(.closecommentmedia)',function(e){
 
   replaceExpand("youtube", $(this).data("video"), $(this) );
@@ -1565,10 +1241,6 @@ $('html').not('.shinelight').on('click','.comment-youtube:not(.closecommentmedia
 	e.preventDefault();
 
 });
-
-
-
-
 
 
 $('html').not('.shinelight').on('click','.comment-html5:not(.closecommentmedia)', function(e){
@@ -1580,22 +1252,6 @@ $('html').not('.shinelight').on('click','.comment-html5:not(.closecommentmedia)'
 });
 
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 $('html').not('.shinelight').on('click','.closecommentmedia', function(e){
 
   replaceExpand( $('.shine-expand').attr("data-original-type"), $('.shine-expand').attr("data-original-data"), $(this) );
@@ -1603,9 +1259,6 @@ $('html').not('.shinelight').on('click','.closecommentmedia', function(e){
   e.preventDefault();
 
 });
-
-
-
 
 
 $('body').on('click','.toggle-child-comments', function(){
@@ -1631,22 +1284,10 @@ $('body').on('click','.inline-child-toggle', function(){
 });
 
 
-
-
-
-
-
-
-
-
-
-
-
 $(document).on('keyup keydown', function(e){
 
   if(e.keyCode == "27"){
-    resetInterfaces();
+	resetInterfaces();
   }
 
 });
-

@@ -3,9 +3,9 @@ var isCommentPage = ($("body").hasClass("comments-page") ? true : false);
 if(isCommentPage == true) {
 	if (commentNumber == undefined) {
 		var commentNumber = -1;
-	}	
+	}
 	$("body").find('.commentarea > .sitetable > .comment').each(function(i) {
-	    $(this).addClass('comment-' + i);
+		$(this).addClass('comment-' + i);
 	});
 }
 
@@ -13,11 +13,11 @@ $.fn.scrollParent = function() {
   var position = this.css( "position" ),
   excludeStaticParent = position === "absolute",
   scrollParent = this.parents().filter( function() {
-    var parent = $( this );
-    if ( excludeStaticParent && parent.css( "position" ) === "static" ) {
-      return false;
-    }
-    return (/(auto|scroll)/).test( parent.css( "overflow" ) + parent.css( "overflow-y" ) + parent.css( "overflow-x" ) );
+	var parent = $( this );
+	if ( excludeStaticParent && parent.css( "position" ) === "static" ) {
+	  return false;
+	}
+	return (/(auto|scroll)/).test( parent.css( "overflow" ) + parent.css( "overflow-y" ) + parent.css( "overflow-x" ) );
   }).eq( 0 );
 
   return position === "fixed" || !scrollParent.length ? $( this[ 0 ].ownerDocument || document ) : scrollParent;
@@ -33,14 +33,14 @@ function commentScroller (direction) {
 	var nextNumber;
 
 	if (direction == 'prev') {
-		nextNumber = commentNumber-1;		
+		nextNumber = commentNumber-1;
 		if($('.comment-'+ nextNumber).length){
-    		commentNumber--;
+			commentNumber--;
 		}
 	} else {
 		nextNumber = commentNumber+1;
 		if($('.comment-'+ nextNumber).length){
-    		commentNumber++;
+			commentNumber++;
 		}
 	}
 
@@ -68,7 +68,7 @@ $('body').on('click','.shine-comment-prev', function(){
 
 // KEY SHORTCUTS
 $('body').keyup(function (e) {
-    if (!$(e.target).is("input, textarea, select, [contenteditable], video, audio") && !e.ctrlKey && !e.altKey && !e.metaKey) {
+	if (!$(e.target).is("input, textarea, select, [contenteditable], video, audio") && !e.ctrlKey && !e.altKey && !e.metaKey) {
 		if (e.keyCode != 27 && $('html').hasClass("shine-no-keys")) {
 			return;
 		}
@@ -78,7 +78,7 @@ $('body').keyup(function (e) {
 			if (typeof resetInterfaces === "function") {
 				resetInterfaces();
 			}
-	     	break;
+			break;
 		case 39:
 			commentScroller('next');
 			break;

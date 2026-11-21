@@ -88,20 +88,20 @@ if( chrome.runtime.getURL("").indexOf("chrome-extension://") !== 0 ){
 
 // this function returns our query string variable
 function getQueryString(name) {
-    name = name.replace(/[\[]/, "\\[").replace(/[\]]/, "\\]");
-    var regex = new RegExp("[\\?&]" + name + "=([^&#]*)"),
-        results = regex.exec(location.search);
-    return results === null ? "" : decodeURIComponent(results[1].replace(/\+/g, " "));
+	name = name.replace(/[\[]/, "\\[").replace(/[\]]/, "\\]");
+	var regex = new RegExp("[\\?&]" + name + "=([^&#]*)"),
+		results = regex.exec(location.search);
+	return results === null ? "" : decodeURIComponent(results[1].replace(/\+/g, " "));
 }
 
 function IsJsonString(str) {
-    
-    try {
-        JSON.parse(str);
-    } catch (e) {
-        return false;
-    }
-    return true;
+
+	try {
+		JSON.parse(str);
+	} catch (e) {
+		return false;
+	}
+	return true;
 
 }
 
@@ -116,9 +116,9 @@ var commentNumber; // For numbering comments
 // creating the default settings variable if they havn't saved any settings yet
 var defaultSettings = {
 	"global" : {
-		"layout" : "list", 
-		"shortcuts" : "show", 
-		"sidebar" : "", 
+		"layout" : "list",
+		"shortcuts" : "show",
+		"sidebar" : "",
 		"multis" : "",
 		"navigate" : "hide",
 		"redirect" : "on",
@@ -132,40 +132,39 @@ var defaultSettings = {
 		"icons" : "gray"
 	},
 
-    "list" :  {
-    	"split" : "6040", 
-    	"columns" : "two",
-    	"limit" : "0"
-    },
+	"list" :  {
+		"split" : "6040",
+		"columns" : "two",
+		"limit" : "0"
+	},
 
-    "grid" :  {
-    	"columns" : "5", 
-    	"nsfw" : "no", 
-    	"split" : "6040",
-    	"limit" : "0"
-    },
+	"grid" :  {
+		"columns" : "5",
+		"nsfw" : "no",
+		"split" : "6040",
+		"limit" : "0"
+	},
 
-    "subreddits" : [
-    	{"url" : "old.reddit.com/r/aww/", "layout" : "grid"},
-    	{"url" : "old.reddit.com/r/earthporn/", "layout" : "grid"}
-    ],
+	"subreddits" : [
+		{"url" : "old.reddit.com/r/aww/", "layout" : "grid"},
+		{"url" : "old.reddit.com/r/earthporn/", "layout" : "grid"}
+	],
 
-    "multireddits" : [],
+	"multireddits" : [],
 
-    "account" : {
-    	"status" : "shinebright"
-    },
+	"account" : {
+		"status" : "shinebright"
+	},
 
-    "message" : "",
+	"message" : "",
 
-    "version" : {
-    	"current" : "",
-    	"updateinfo" : "show",
-    	"dismissed" : "no"
-    }
+	"version" : {
+		"current" : "",
+		"updateinfo" : "show",
+		"dismissed" : "no"
+	}
 
 };
-
 
 
 // this creates our variable that stories what today's date is
@@ -173,9 +172,6 @@ var d = new Date();
 var curr_date = d.getDate();
 var curr_month = d.getMonth() + 1;
 todayIs = curr_month.toString() + curr_date.toString();
-
-
-
 
 
 // this is the main SHINE base function that runs after we've retrieved or created thier settings
@@ -195,7 +191,7 @@ function SHINE(){
 		currentSettings.global.keyboard = "on";
 		chrome.storage.local.set({"shine": currentSettings});
 	}
-	
+
 
 	//console.log(currentSettings);
 
@@ -203,10 +199,10 @@ function SHINE(){
 
 		var changelogSettings = {
 			"version" : {
-		    	"current" : "",
-		    	"updateinfo" : "show",
-		    	"dismissed" : "no"
-		    }
+				"current" : "",
+				"updateinfo" : "show",
+				"dismissed" : "no"
+			}
 		};
 
 		currentSettings = $.extend(currentSettings, changelogSettings);
@@ -234,8 +230,8 @@ function SHINE(){
 
 		var navigateSettings = {
 			"global" : {
-		    	"navigate" : "hide"
-		    }
+				"navigate" : "hide"
+			}
 		};
 
 		currentSettings = $.extend(true, currentSettings, navigateSettings);
@@ -247,11 +243,11 @@ function SHINE(){
 
 		var limitSettings = {
 			"list" : {
-		    	"limit" : "0"
-		    },
-		    "grid" : {
-		    	"limit" : "0"
-		    }
+				"limit" : "0"
+			},
+			"grid" : {
+				"limit" : "0"
+			}
 		};
 
 		currentSettings = $.extend(true, currentSettings, limitSettings);
@@ -271,7 +267,7 @@ function SHINE(){
 		'<div class="dark-background"></div>'+
 
 		'<div class="shine-nav">'+
-			
+
 			'<div class="shine-menu-button shine-search">'+
 				'<label>search reddit</label>'+
 			'</div>'+
@@ -307,28 +303,28 @@ function SHINE(){
 		'</div>'+
 
 		'<div class="shine-nav-comment">'+
-			
+
 			'<div class="shine-menu-button shine-comment-prev">'+
 			'</div>'+
-			
+
 			'<div class="shine-menu-button shine-comment-next">'+
 			'</div>'+
 
 		'</div>'+
 
 		'<form action="/' + currentSubreddit + 'search" id="shine-search" name="search">'+
-        	'<div class="shine-search-wrapper"><input name="q" placeholder="type here and hit enter" tabindex="20" type="text" id="shine-search-box">'+
-        	'<a href="/wiki/search" title="advanced search: by author, subreddit..."></a>'+
-        	'</div>'+
-        	'<input tabindex="22" type="submit" value="">';
+			'<div class="shine-search-wrapper"><input name="q" placeholder="type here and hit enter" tabindex="20" type="text" id="shine-search-box">'+
+			'<a href="/wiki/search" title="advanced search: by author, subreddit..."></a>'+
+			'</div>'+
+			'<input tabindex="22" type="submit" value="">';
 
-        if (currentSubreddit && currentSubreddit.length) {
+		if (currentSubreddit && currentSubreddit.length) {
 			htmlToAdd = htmlToAdd +
-        	'<label class="currentSubreddit"><input type="checkbox" name="restrict_sr" tabindex="21"> limit to ' + currentSubreddit + '</label>';
-        }
+			'<label class="currentSubreddit"><input type="checkbox" name="restrict_sr" tabindex="21"> limit to ' + currentSubreddit + '</label>';
+		}
 
 		htmlToAdd = htmlToAdd +
-    	'</form>';
+		'</form>';
 
 	$('body').append(htmlToAdd);
 
@@ -354,8 +350,6 @@ function SHINE(){
 	$('.shine-nav .subscribe-button .option').addClass("shine-menu-button shine-subscribe");
 
 
-
-
 	// HERE WE ADD THE SETTINGS DIV
 	$('body').append(''+
 
@@ -376,7 +370,7 @@ function SHINE(){
 							'<option value="grid">Grid View</option>'+
 						'</select>'+
 					'</div>'+
-					'<div class="settings-column-half">'+					
+					'<div class="settings-column-half">'+
 						'<label for="settings-shortcuts-bar">Shortcuts Bar</label>'+
 						'<span class="settings-small-print">Hide or show the shortcuts bar at the top.</span>'+
 						'<select name="settings-shortcuts-bar" id="settings-shortcuts-bar">'+
@@ -394,7 +388,7 @@ function SHINE(){
 							'<option value="hide">Hide</option>'+
 						'</select>'+
 					'</div>'+
-					'<div class="settings-column-half">'+					
+					'<div class="settings-column-half">'+
 						'<label for="settings-comment-navigation">Next/Previous Comment Navigation</label>'+
 						'<span class="settings-small-print">Buttons for navigating comments. You can also use left/right arrow keys.</span>'+
 						'<select name="settings-comment-navigation" id="settings-comment-navigation">'+
@@ -801,7 +795,6 @@ function SHINE(){
 	);
 
 
-
 	/* COMMENT NAVIGATION */
 
 	if( currentSettings.global.navigate == "show" ){
@@ -895,15 +888,15 @@ function SHINE(){
 	/* LIST VIEW */
 
 	$('#settings-list-layout').val( currentSettings.list.columns );
-	
+
 	/* GRID SPLIT */
-	
+
 	if( currentSettings.grid.split == "7030" || currentSettings.grid.split == "6040" || currentSettings.grid.split == "5050" || currentSettings.grid.split == "4060" || currentSettings.grid.split == "3070"){
 		$('#settings-grid-split').val( currentSettings.grid.split );
 	}
-	
+
 	/* LIST SPLIT */
-	
+
 	if( currentSettings.list.split == "7030" || currentSettings.list.split == "6040" || currentSettings.list.split == "5050" || currentSettings.list.split == "4060" || currentSettings.list.split == "3070"){
 		$('#settings-list-split').val( currentSettings.list.split );
 	}
@@ -948,9 +941,6 @@ function SHINE(){
 	$('#settings-font').val( currentSettings.customization.font || "opensans" );
 
 
-
-
-
 	// this adds hide nsfw class
 
 	if( currentSettings.grid.nsfw == "no" ){
@@ -960,7 +950,6 @@ function SHINE(){
 
 	// this adds a class to the html that says if we've paid or not
 	$('html').addClass( currentSettings.account.status );
-
 
 
 	// this adds the sidebar class and multireddit class
@@ -1069,38 +1058,36 @@ function SHINE(){
 				'</style>'
 
 			);
-			
+
 			if( currentSettings.grid.split == "7030" || currentSettings.grid.split == "6040" || currentSettings.grid.split == "5050" || currentSettings.grid.split == "4060" || currentSettings.grid.split == "3070"){
-				
+
 				$('html').addClass("shine-splitheme-" + currentSettings.grid.split);
-				
+
 			}
-			
-			
+
 
 		}else if( whichView == "list" ){
 
 			if(currentSettings.list.columns == "two"){
 				$('html').addClass("shine-list-classic");
-			}			
+			}
 
 			mainWorldScripts.push("jquery.zoom.min.js", "shine-media.js", "shine-list.js");
-			
+
 			if(currentSettings.list.split == "7030" || currentSettings.list.split == "6040" || currentSettings.list.split == "5050" || currentSettings.list.split == "4060" || currentSettings.list.split == "3070"){
-				
+
 				if( !$('html').hasClass("shine-list-classic") ){
 					$('html').addClass("shine-split-" + currentSettings.list.split);
-				}	
-				
+				}
+
 			}
-			
+
 
 		}
 
 
 		// add our view class to the html
 		$('html').addClass("shine-" + whichView);
-
 
 
 	}else{
@@ -1118,9 +1105,9 @@ function SHINE(){
 	headLinks = $('head link');
 
 	for(i = 0;i<headLinks.length;i++){
-		
+
 		if( $(headLinks[i]).attr("title") == "applied_subreddit_stylesheet" ){
-			
+
 			subredditCss = $(headLinks[i]).attr("href");
 
 			$(headLinks[i]).remove();
@@ -1155,7 +1142,7 @@ function SHINE(){
 		currentSettings.version.dismissed = "no";
 		currentSettings.version.current = shineVersion;
 		chrome.storage.local.set({"shine": currentSettings});
-	    $('.update-info').fadeIn('fast');
+		$('.update-info').fadeIn('fast');
 	} else if (currentSettings.version.current == shineVersion && currentSettings.version.updateinfo != "hide" && currentSettings.version.dismissed != "yes"){
 		$('.update-info').show();
 	}
@@ -1191,7 +1178,7 @@ function getSettings(){
 
 			chrome.storage.local.set({"shine": defaultSettings});
 
-	   		getSettings();
+			getSettings();
 
 		}else{
 
@@ -1237,9 +1224,9 @@ function resetInterfaces(){
 
 function clearThemes(){
 
-	$('html, body').removeClass("res-nightmode lightmode");	
+	$('html, body').removeClass("res-nightmode lightmode");
 	$('html, body').removeClass (function (index, className) {
-	    return (className.match (/\btheme-\S+/g) || []).join(' ');
+		return (className.match (/\btheme-\S+/g) || []).join(' ');
 	});
 
 }
@@ -1587,13 +1574,13 @@ $('body').on('change','#settings-grid-split', function(){
 	currentSettings.grid.split = $(this).val();
 
 	chrome.storage.local.set({"shine": currentSettings}, function(){
-		
+
 		if( $('html').hasClass("shine-grid") ){
 
 			$('html').removeClass("shine-split-7030 shine-split-6040 shine-split-5050 shine-split-4060 shine-split-3070");
-			
+
 			$('html').addClass("shine-split-" + currentSettings.grid.split);
-		
+
 		}
 
 		saveSettingsMessage();
@@ -1607,13 +1594,13 @@ $('body').on('change','#settings-list-split', function(){
 	currentSettings.list.split = $(this).val();
 
 	chrome.storage.local.set({"shine": currentSettings}, function(){
-		
+
 		if( $('html').hasClass("shine-list") && !$('html').hasClass("shine-list-classic") ){
 
 			$('html').removeClass("shine-split-7030 shine-split-6040 shine-split-5050 shine-split-4060 shine-split-3070");
-			
+
 			$('html').addClass("shine-split-" + currentSettings.list.split);
-			
+
 		}
 
 		saveSettingsMessage();
@@ -2067,12 +2054,12 @@ $('body').on('change','input[type=radio][name=settings-color-theme]',function(){
 	currentSettings.customization.color = $(this).val();
 
 	chrome.storage.local.set({"shine": currentSettings}, function(){
-		
+
 		$('html').removeClass (function (index, className) {
-		    return (className.match (/\bcolor-\S+/g) || []).join(' ');
+			return (className.match (/\bcolor-\S+/g) || []).join(' ');
 		});
 		$('body').removeClass (function (index, className) {
-		    return (className.match (/\bcolor-\S+/g) || []).join(' ');
+			return (className.match (/\bcolor-\S+/g) || []).join(' ');
 		});
 
 		$('html, body').addClass("color-"+currentSettings.customization.color);
@@ -2096,7 +2083,7 @@ $('body').on('change','#settings-custom-color', function(){
 	chrome.storage.local.set({"shine": currentSettings}, function(){
 
 		$('html, body').removeClass(function (index, className) {
-		    return (className.match(/\bcolor-\S+/g) || []).join(' ');
+			return (className.match(/\bcolor-\S+/g) || []).join(' ');
 		});
 		$('html, body').addClass("color-custom");
 		$('input[type="radio"][name="settings-color-theme"][value="custom"]').prop('checked', true);
@@ -2195,5 +2182,3 @@ $('body').on('mouseover','.menuarea',function(){
 $("body").on('mouseout','.menuarea',function(){
 	$('.menuarea').find('.drop-choices.lightdrop').removeClass("inuse");
 });
-
-

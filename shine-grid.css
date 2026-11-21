@@ -15,16 +15,16 @@ html.SHINE.shine-grid body > .content #siteTable .thing ul.flat-list li.report-b
 html.SHINE.shine-grid body > .content #siteTable .thing ul.flat-list li:last-of-type,
 html.SHINE.shine-grid body > .content #siteTable .thing .newComments,
 html.SHINE.shine-grid body .nav-buttons{
-	display:none !important;
+    display:none !important;
 }
 
 html.SHINE.shine-grid body{
-	background:#f1f1f1;
+    background:#f1f1f1;
 }
 
 html.SHINE.shine-grid body > .content .spacer{
-	padding:0px !important;
-	margin:0px !important;
+    padding:0px !important;
+    margin:0px !important;
 }
 
 html.SHINE.shine-grid body > .content {
@@ -86,7 +86,7 @@ html.SHINE.shine-grid.shine-hide-nsfw body > .content #siteTable .thing.over18:h
 }
 
 html.SHINE.shine-grid body > .content #siteTable .thing .RES-keyNav-activeElement{
-	background-color: transparent !important;
+    background-color: transparent !important;
 }
 
 html.SHINE.shine-grid body > .content #siteTable .thing .entry,
@@ -96,7 +96,7 @@ html.SHINE.shine-grid body > .content #siteTable .thing .top-matter {
     margin:0px;
     display: flex;
     flex-direction: column;
-	flex-grow: 1;
+    flex-grow: 1;
 }
 
 html.SHINE.shine-grid body > .content #siteTable .thing .midcol {
@@ -135,7 +135,7 @@ html.SHINE.shine-grid body.front-page > .content #siteTable .thing span.linkflai
     margin: 0px;
     padding: 0px;
     box-sizing: border-box;
-    text-transform: uppercase; 
+    text-transform: uppercase;
 }
 
 html.SHINE.shine-grid body > .content #siteTable .thing .entry p.title {
@@ -176,7 +176,7 @@ html.SHINE.shine-grid body > .content #siteTable .thing .entry ul.flat-list {
 }
 
 html.SHINE.shine-grid body > .content #siteTable .thing span.domain {
-	color: rgba(255,255,255,0);
+    color: rgba(255,255,255,0);
     display: block;
     left: -2px;
     position: relative;
@@ -209,7 +209,7 @@ html.SHINE.shine-grid body > .content #siteTable .thing ul.flat-list li a{
 }
 
 html.SHINE.shine-grid body > .content #siteTable .thing ul.flat-list li a:hover{
-	text-decoration: none;
+    text-decoration: none;
 }
 
 html.SHINE.shine-grid body > .content #siteTable .thing ul.flat-list li a.comments{
@@ -221,7 +221,7 @@ html.SHINE.shine-grid body > .content #siteTable .thing ul.flat-list li a.commen
 }
 
 html.SHINE.shine-grid body > .content #siteTable .thing ul.flat-list li.save-button a{
-	width: 18px;
+    width: 18px;
     text-indent: 100%;
     white-space: nowrap;
     overflow: hidden;
@@ -232,7 +232,7 @@ html.SHINE.shine-grid body > .content #siteTable .thing ul.flat-list li.save-but
 }
 
 html.SHINE.shine-grid body > .content #siteTable .thing ul.flat-list .hide-button a{
-	width: 15px;
+    width: 15px;
     text-indent: 100%;
     white-space: nowrap;
     overflow: hidden;
@@ -353,7 +353,7 @@ html.SHINE.shine-grid .preview-album::after{
     background-image:url(data:image/svg+xml;base64,PD94bWwgdmVyc2lvbj0iMS4wIiBlbmNvZGluZz0idXRmLTgiPz48c3ZnIHZlcnNpb249IjEuMSIgaWQ9InN2ZzExOTI3IiB4bWxuczpzb2RpcG9kaT0iaHR0cDovL3NvZGlwb2RpLnNvdXJjZWZvcmdlLm5ldC9EVEQvc29kaXBvZGktMC5kdGQiIHhtbG5zOmNjPSJodHRwOi8vY3JlYXRpdmVjb21tb25zLm9yZy9ucyMiIHhtbG5zOnN2Zz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHhtbG5zOnJkZj0iaHR0cDovL3d3dy53My5vcmcvMTk5OS8wMi8yMi1yZGYtc3ludGF4LW5zIyIgeG1sbnM6aW5rc2NhcGU9Imh0dHA6Ly93d3cuaW5rc2NhcGUub3JnL25hbWVzcGFjZXMvaW5rc2NhcGUiIHhtbG5zOmRjPSJodHRwOi8vcHVybC5vcmcvZGMvZWxlbWVudHMvMS4xLyIgaW5rc2NhcGU6dmVyc2lvbj0iMC40OC40IHI5OTM5IiBzb2RpcG9kaTpkb2NuYW1lPSJOZXcgZG9jdW1lbnQgOSIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIiB4bWxuczp4bGluaz0iaHR0cDovL3d3dy53My5vcmcvMTk5OS94bGluayIgeD0iMHB4IiB5PSIwcHgiIHZpZXdCb3g9Ii0yMDQuOCAzNDcgMTkxLjUgMTM0LjIiIHN0eWxlPSJlbmFibGUtYmFja2dyb3VuZDpuZXcgLTIwNC44IDM0NyAxOTEuNSAxMzQuMjsiIHhtbDpzcGFjZT0icHJlc2VydmUiPjxzdHlsZSB0eXBlPSJ0ZXh0L2NzcyI+LnN0MHtmaWxsOiNGRkZGRkY7fTwvc3R5bGU+PHNvZGlwb2RpOm5hbWVkdmlldyAgYm9yZGVybGF5ZXI9ImZhbHNlIiBpbmtzY2FwZTpjeD0iMTcxLjAwMjYzIiBib3JkZXJjb2xvcj0iIzY2NjY2NiIgcGFnZWNvbG9yPSIjZmZmZmZmIiBib3JkZXJvcGFjaXR5PSIxLjAiIGlua3NjYXBlOnpvb209IjEuOTc5ODk5IiBmaXQtbWFyZ2luLXRvcD0iMCIgZml0LW1hcmdpbi1sZWZ0PSIwIiBpbmtzY2FwZTpjeT0iNDUuMjYwNjg5IiBpZD0iYmFzZSIgc2hvd2dyaWQ9ImZhbHNlIiB1bml0cz0ibW0iIGlua3NjYXBlOndpbmRvdy1tYXhpbWl6ZWQ9IjEiIGlua3NjYXBlOndpbmRvdy13aWR0aD0iMTY4MCIgZml0LW1hcmdpbi1ib3R0b209IjAiIGlua3NjYXBlOmN1cnJlbnQtbGF5ZXI9ImxheWVyMSIgaW5rc2NhcGU6ZG9jdW1lbnQtdW5pdHM9Im1tIiBpbmtzY2FwZTpwYWdlc2hhZG93PSIyIiBpbmtzY2FwZTp3aW5kb3ctaGVpZ2h0PSI5ODgiIGlua3NjYXBlOndpbmRvdy14PSItOCIgaW5rc2NhcGU6d2luZG93LXk9Ii04IiBmaXQtbWFyZ2luLXJpZ2h0PSIwIiBpbmtzY2FwZTpwYWdlb3BhY2l0eT0iMC4wIj48L3NvZGlwb2RpOm5hbWVkdmlldz48cGF0aCBpZD0icGF0aDExOTA1IiBzb2RpcG9kaTpub2RldHlwZXM9ImNzc3NjY2NzY2NjY2NjIiBpbmtzY2FwZTpjb25uZWN0b3ItY3VydmF0dXJlPSIwIiBjbGFzcz0ic3QwIiBkPSJNLTEzLjMsNDEwLjRjLTAuNS0zOS42LDQuNC01OS42LTM4LjMtNjIuM2MtMzAuNi0xLjUtMTA3LjYtMS40LTEyMi4xLDAuMWMtMTQuOSwxLjYtMjAsNC4zLTI0LjMsMTIuN2MtNS41LDEwLjktNi45LDIyLjItNi44LDU1LjVjMC4xLDQ3LjEsNC44LDYwLjEsMjMuMSw2My45YzMuNiwwLjgsMzcsMS4yLDc3LjMsMWM3OS4zLTAuNCw3Ni43LTAuMSw4My41LTEwLjRDLTEzLjksNDYwLjQtMTIuOCw0NTEuNC0xMy4zLDQxMC40eiIvPjxwYXRoIGQ9Ik0tODMuOSw0MjQuMnYtMzAuMmMwLTIuOC0yLjMtNS01LTVILTExOWMtMi44LDAtNSwyLjMtNSw1djMwLjJjMCwyLjgsMi4zLDUsNSw1aDMwLjJDLTg2LjEsNDI5LjItODMuOSw0MjctODMuOSw0MjQuMnogTS0xMTEuNSw0MTQuMmw1LjEsNi44bDcuNS05LjNsMTAuMSwxMi42SC0xMTlMLTExMS41LDQxNC4yeiBNLTEzNC4xLDM5OS4xdjM1LjJjMCwyLjgsMi4zLDUsNSw1aDM1LjJ2LTVoLTM1LjJ2LTM1LjJILTEzNC4xeiIvPjwvc3ZnPg==);
     background-repeat:no-repeat;
     background-position: center;
-    background-size:75px auto;    
+    background-size:75px auto;
 }
 
 html.SHINE.shine-grid .preview-text {
@@ -457,25 +457,25 @@ html.SHINE.shine-grid .shine-expand .large-html5{
 html.SHINE.shine-grid.shine-split-6040 .shine-expand .large-image,
 html.SHINE.shine-grid.shine-split-6040 .shine-expand .large-youtube,
 html.SHINE.shine-grid.shine-split-6040 .shine-expand .large-html5{
-	width:60%;
+    width:60%;
 }
 
 html.SHINE.shine-grid.shine-split-5050 .shine-expand .large-image,
 html.SHINE.shine-grid.shine-split-5050 .shine-expand .large-youtube,
 html.SHINE.shine-grid.shine-split-5050 .shine-expand .large-html5{
-	width:50%;
+    width:50%;
 }
 
 html.SHINE.shine-grid.shine-split-4060 .shine-expand .large-image,
 html.SHINE.shine-grid.shine-split-4060 .shine-expand .large-youtube,
 html.SHINE.shine-grid.shine-split-4060 .shine-expand .large-html5{
-	width:40%;
+    width:40%;
 }
 
 html.SHINE.shine-grid.shine-split-3070 .shine-expand .large-image,
 html.SHINE.shine-grid.shine-split-3070 .shine-expand .large-youtube,
 html.SHINE.shine-grid.shine-split-3070 .shine-expand .large-html5{
-	width:30%;
+    width:30%;
 }
 
 
@@ -493,19 +493,19 @@ html.SHINE.shine-grid .shine-expand .large-album{
 }
 
 html.SHINE.shine-grid.shine-split-6040 .shine-expand .large-album{
-	width:50%;
+    width:50%;
 }
 
 html.SHINE.shine-grid.shine-split-5050 .shine-expand .large-album{
-	width:40%;
+    width:40%;
 }
 
 html.SHINE.shine-grid.shine-split-4060 .shine-expand .large-album{
-	width:35%;
+    width:35%;
 }
 
 html.SHINE.shine-grid.shine-split-3070 .shine-expand .large-album{
-	width:25%;
+    width:25%;
 }
 
 html.SHINE.shine-grid .shine-expand .album-thumbnails{
@@ -521,21 +521,21 @@ html.SHINE.shine-grid .shine-expand .album-thumbnails{
 }
 
 html.SHINE.shine-grid.shine-split-6040 .shine-expand .album-thumbnails{
-	left:50%;
+    left:50%;
 }
 
 html.SHINE.shine-grid.shine-split-5050 .shine-expand .album-thumbnails{
-	left:40%;
+    left:40%;
 }
 
 html.SHINE.shine-grid.shine-split-4060 .shine-expand .album-thumbnails{
-	left:35%;
-	width:5%;
+    left:35%;
+    width:5%;
 }
 
 html.SHINE.shine-grid.shine-split-3070 .shine-expand .album-thumbnails{
-	left:25%;
-	width:5%;
+    left:25%;
+    width:5%;
 }
 
 html.SHINE.shine-grid .shine-expand .album-thumbnails img{
@@ -582,19 +582,19 @@ html.SHINE.expand-albums.activate-captions .album-captions {
 }
 
 html.SHINE.shine-split-6040.expand-albums.activate-captions .album-captions{
-	width:50%;
+    width:50%;
 }
 
 html.SHINE.shine-split-5050.expand-albums.activate-captions .album-captions{
-	width:40%;
+    width:40%;
 }
 
 html.SHINE.shine-split-4060.expand-albums.activate-captions .album-captions{
-	width:35%;
+    width:35%;
 }
 
 html.SHINE.shine-split-3070.expand-albums.activate-captions .album-captions{
-	width:25%;
+    width:25%;
 }
 
 html.SHINE .album-captions .caption-text{
@@ -615,9 +615,9 @@ html.SHINE .album-captions strong{
 
 
 html.SHINE .album-captions p{
-    line-height: 24px;    
+    line-height: 24px;
     color: #fff;
-    font-size: 16px;    
+    font-size: 16px;
 }
 
 html.SHINE .show-captions {
@@ -647,27 +647,25 @@ html.SHINE.shine-grid .shine-expand .side-comments{
 }
 
 html.SHINE.shine-grid.shine-split-6040 .shine-expand .side-comments{
-	width:40%;
+    width:40%;
 }
 
 html.SHINE.shine-grid.shine-split-5050 .shine-expand .side-comments{
-	width:50%;
+    width:50%;
 }
 
 html.SHINE.shine-grid.shine-split-4060 .shine-expand .side-comments{
-	width:60%;
+    width:60%;
 }
 
 html.SHINE.shine-grid.shine-split-3070 .shine-expand .side-comments{
-	width:70%;
+    width:70%;
 }
 
 html.SHINE.shine-grid.expand-comments .shine-expand .side-comments{
     width:100%;
     padding:45px;
 }
-
-
 
 
 /* NIGHT MODE STUFF */
@@ -692,7 +690,7 @@ html.SHINE.shine-grid.res-nightmode .preview-text p {
     color: #AAA;
 }
 
-html.SHINE.shine-grid.res-nightmode body > .content #siteTable .thing ul.flat-list li, 
+html.SHINE.shine-grid.res-nightmode body > .content #siteTable .thing ul.flat-list li,
 html.SHINE.shine-grid.res-nightmode body > .content #siteTable .thing ul.flat-list li a {
     color: #fff;
 }

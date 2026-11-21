@@ -12,29 +12,29 @@ html.SHINE {
 					}
 
 					div#siteTable.linklisting {
-					    width: 50% !important;
-					    margin-left: 0px !important;
-					    box-shadow: transparent 0 0 0;
+						width: 50% !important;
+						margin-left: 0px !important;
+						box-shadow: transparent 0 0 0;
 					}
 				}
 				.shine-expand {
 					left: calc(50% + 1px) !important;
-				    width: calc(50% - 2px) !important;
-				    box-shadow: $color_border_shineexpand -1px 0px 0px !important;
-				    top: 45px !important;
-				    height: calc(100% - 45px) !important;
+					width: calc(50% - 2px) !important;
+					box-shadow: $color_border_shineexpand -1px 0px 0px !important;
+					top: 45px !important;
+					height: calc(100% - 45px) !important;
 				}
 				#header .layout-switch {
-				    left: calc(50% - 45px);
+					left: calc(50% - 45px);
 				}
 
 				&.show-shortcuts .shine-expand {
-				    top: 65px !important;
-				    height: calc(100% - 65px) !important;
+					top: 65px !important;
+					height: calc(100% - 65px) !important;
 				}
 				&.show-sidebar .shine-expand {
-				    left: calc(50% - 180px) !important;
-				    width: calc(50% - 180px) !important;
+					left: calc(50% - 180px) !important;
+					width: calc(50% - 180px) !important;
 				}
 			}
 
@@ -51,34 +51,34 @@ html.SHINE {
 							background-color: $color_bg_darker !important;
 						}
 						a.thumbnail {
-						    order: 2;
-						    width: 60px;
-						    min-width: 60px;
-						    height: 60px;
-						    margin: 0 15px 0 5px;
-						    overflow: hidden;
-						    border-radius: 2px;
+							order: 2;
+							width: 60px;
+							min-width: 60px;
+							height: 60px;
+							margin: 0 15px 0 5px;
+							overflow: hidden;
+							border-radius: 2px;
 
-						    img {
-						    	object-fit: cover;
-							    width: 60px;
-							    height: 60px;
-						    }
+							img {
+								object-fit: cover;
+								width: 60px;
+								height: 60px;
+							}
 						}
 
-					    .midcol {
-						    order: 1;
+						.midcol {
+							order: 1;
 						}
 					}
 
 					.thumbnail.spoiler::before, .thumbnail.nsfw::before, .thumbnail.default::before, .thumbnail.image::before, .thumbnail.self::before {
-					    margin-top: -30px;
-					    margin-left: -30px;
-					    width: 60px;
-					    height: 60px;
-					    //color: #999;
-					    line-height: 60px;
-					    border-radius: 4px;
+						margin-top: -30px;
+						margin-left: -30px;
+						width: 60px;
+						height: 60px;
+						//color: #999;
+						line-height: 60px;
+						border-radius: 4px;
 					}
 				}
 			}
